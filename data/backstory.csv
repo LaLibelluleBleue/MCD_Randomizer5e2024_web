@@ -1,0 +1,106 @@
+﻿table,dice,roll,result,value,tag,source
+parents,d100,1-94,You know who your parents were.,,known,CUSTOM
+parents,d100,95-100,You never knew your parents.,,unknown,CUSTOM
+parentage_tiefling,d8,1-4,Both of your parents were tieflings.,,same,CUSTOM
+parentage_tiefling,d8,5-6,Both parents were human; the infernal blood skipped generations before it surfaced in you.,,human,CUSTOM
+parentage_tiefling,d8,7-8,One parent was a tiefling and the other was human.,,mixed,CUSTOM
+parentage_aasimar,d6,1-2,Both of your parents were aasimar.,,same,CUSTOM
+parentage_aasimar,d6,3-6,Both parents were ordinary humans; the celestial spark appeared in you alone.,,human,CUSTOM
+birthplace,d100,1-50,You were born at home.,,,CUSTOM
+birthplace,d100,51-65,You were born in the house of a relative or neighbor.,,,CUSTOM
+birthplace,d100,66-70,"You were born in a temple, infirmary or healer's cottage.",,,CUSTOM
+birthplace,d100,71-75,"You were born in a cart, carriage or ship while your family traveled.",,,CUSTOM
+birthplace,d100,76-80,You were born in a tavern or inn.,,,CUSTOM
+birthplace,d100,81-85,"You were born in a barn, workshop or storehouse.",,,CUSTOM
+birthplace,d100,86-90,"You were born in a cave, ruin or wilderness camp.",,,CUSTOM
+birthplace,d100,91-95,"You were born in a market, street or alley.",,,CUSTOM
+birthplace,d100,96-98,"You were born in a fortress, barracks or watchtower.",,,CUSTOM
+birthplace,d100,99-100,You were born in a place nobody can fully explain.,,,CUSTOM
+siblings,d10,1-2,You have no siblings.,0,,CUSTOM
+siblings,d10,3-4,You have a few siblings.,1d3,,CUSTOM
+siblings,d10,5-6,You have a number of siblings.,1d4+1,,CUSTOM
+siblings,d10,7-8,You have a large family of siblings.,1d6+2,,CUSTOM
+siblings,d10,9-10,You have a great many siblings.,1d8+3,,CUSTOM
+birthorder,2d6,2,twin,,twin,CUSTOM
+birthorder,2d6,3-7,older,,older,CUSTOM
+birthorder,2d6,8-12,younger,,younger,CUSTOM
+family,d100,1-45,You were raised by both of your parents.,,both,CUSTOM
+family,d100,46-60,You were raised by your mother alone.,,mother,CUSTOM
+family,d100,61-70,You were raised by your father alone.,,father,CUSTOM
+family,d100,71-80,You were raised by a grandparent.,,grandparent,CUSTOM
+family,d100,81-88,You were raised by an aunt or uncle.,,relative,CUSTOM
+family,d100,89-93,"You were raised by a guild, temple or close community.",,institution,CUSTOM
+family,d100,94-97,You were raised in an orphanage or on the streets.,,orphan,CUSTOM
+family,d100,98-100,You were raised by a mentor who took you in.,,mentor,CUSTOM
+absent,d4,1,died when you were young.,Dead,dead,CUSTOM
+absent,d4,2,left the family and never returned.,Left the family,gone,CUSTOM
+absent,d4,3,was imprisoned or held far away.,Imprisoned,away,CUSTOM
+absent,d4,4,vanished without explanation.,Missing,missing,CUSTOM
+lifestyle,3d6,3,Your family lived in wretched poverty.,-40,wretched,CUSTOM
+lifestyle,3d6,4-5,Your family lived in squalid conditions.,-20,squalid,CUSTOM
+lifestyle,3d6,6-8,Your family was poor but got by.,-10,poor,CUSTOM
+lifestyle,3d6,9-12,Your family lived a modest life.,0,modest,CUSTOM
+lifestyle,3d6,13-15,Your family was comfortable.,10,comfortable,CUSTOM
+lifestyle,3d6,16-17,Your family was wealthy.,20,wealthy,CUSTOM
+lifestyle,3d6,18,Your family was rich and powerful.,40,aristocratic,CUSTOM
+childhome,d100,1-10,You grew up on the streets.,,,CUSTOM
+childhome,d100,11-25,You grew up in a crowded tenement or rented room.,,,CUSTOM
+childhome,d100,26-40,You grew up in a modest cottage or farmhouse.,,,CUSTOM
+childhome,d100,41-60,You grew up in a family home in town.,,,CUSTOM
+childhome,d100,61-75,"You grew up in a solid house with a shop, workshop or small farm.",,,CUSTOM
+childhome,d100,76-85,You grew up in a large house with servants.,,,CUSTOM
+childhome,d100,86-93,You grew up in a fine town house or estate.,,,CUSTOM
+childhome,d100,94-100,"You grew up in a mansion, manor or castle.",,,CUSTOM
+agebracket,d100,1-10,Youth,1,11-20,CUSTOM
+agebracket,d100,11-62,Young adult,1d4,21-30,CUSTOM
+agebracket,d100,63-81,Adult,1d6,31-40,CUSTOM
+agebracket,d100,82-90,Mature,1d8,41-50,CUSTOM
+agebracket,d100,91-96,Middle-aged,1d10,51-60,CUSTOM
+agebracket,d100,97-99,Elder,1d12,61-70,CUSTOM
+agebracket,d100,100,Venerable,1d12,71-80,CUSTOM
+occupation,d100,1-5,Adventurer,,adventurer,CUSTOM
+occupation,d100,6-15,Farmer or herder,,,CUSTOM
+occupation,d100,16-25,Craftsperson or artisan,,,CUSTOM
+occupation,d100,26-35,Merchant or shopkeeper,,,CUSTOM
+occupation,d100,36-42,Laborer or dockworker,,,CUSTOM
+occupation,d100,43-50,Soldier or guard,,,CUSTOM
+occupation,d100,51-57,Servant or innkeeper's help,,,CUSTOM
+occupation,d100,58-63,"Scribe, scholar or teacher",,,CUSTOM
+occupation,d100,64-70,Priest or temple worker,,,CUSTOM
+occupation,d100,71-77,Entertainer,,,CUSTOM
+occupation,d100,78-83,"Hunter, guide or sailor",,,CUSTOM
+occupation,d100,84-89,Criminal or smuggler,,,CUSTOM
+occupation,d100,90-94,Healer or herbalist,,,CUSTOM
+occupation,d100,95-97,Noble or landowner,,,CUSTOM
+occupation,d100,98-100,Wanderer or beggar,,,CUSTOM
+alignment,3d6,3-4,Chaotic Evil,,,CUSTOM
+alignment,3d6,5-6,Neutral Evil,,,CUSTOM
+alignment,3d6,7-8,Lawful Evil,,,CUSTOM
+alignment,3d6,9,Chaotic Neutral,,,CUSTOM
+alignment,3d6,10-11,Neutral,,,CUSTOM
+alignment,3d6,12,Lawful Neutral,,,CUSTOM
+alignment,3d6,13-14,Chaotic Good,,,CUSTOM
+alignment,3d6,15-16,Neutral Good,,,CUSTOM
+alignment,3d6,17-18,Lawful Good,,,CUSTOM
+attitude,3d4,3-5,Hostile,,,CUSTOM
+attitude,3d4,6-9,Indifferent,,,CUSTOM
+attitude,3d4,10-12,Friendly,,,CUSTOM
+status,3d6,3,Dead,,dead,CUSTOM
+status,3d6,4-5,Missing,,missing,CUSTOM
+status,3d6,6-8,"Struggling (poor, ill or in trouble)",,,CUSTOM
+status,3d6,9-12,Alive and getting by,,,CUSTOM
+status,3d6,13-15,Doing well,,,CUSTOM
+status,3d6,16-17,Prosperous,,,CUSTOM
+status,3d6,18,Alive and famous,,,CUSTOM
+deathcause,d12,1,Murdered,,,CUSTOM
+deathcause,d12,2,Killed in battle,,,CUSTOM
+deathcause,d12,3,Illness,,,CUSTOM
+deathcause,d12,4,Accident,,,CUSTOM
+deathcause,d12,5,Executed,,,CUSTOM
+deathcause,d12,6,Old age,,,CUSTOM
+deathcause,d12,7,Lost to the wilderness,,,CUSTOM
+deathcause,d12,8,Monster attack,,,CUSTOM
+deathcause,d12,9,Poison,,,CUSTOM
+deathcause,d12,10,Fire,,,CUSTOM
+deathcause,d12,11,A curse,,,CUSTOM
+deathcause,d12,12,Mysterious circumstances,,,CUSTOM

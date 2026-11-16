@@ -1,0 +1,135 @@
+﻿table,dice,roll,result,value,tag,note,source
+eventtype,d100,1-10,Tragedy,,tragedy,,CUSTOM
+eventtype,d100,11-20,Boon,,boon,,CUSTOM
+eventtype,d100,21-30,Love,,love,,CUSTOM
+eventtype,d100,31-40,Enemy,,enemy,,CUSTOM
+eventtype,d100,41-50,Friend,,friend,,CUSTOM
+eventtype,d100,51-60,Job,,job,,CUSTOM
+eventtype,d100,61-70,Important contact,,important,,CUSTOM
+eventtype,d100,71-80,Adventure,,adventure,,CUSTOM
+eventtype,d100,81-85,Supernatural event,,supernatural,,CUSTOM
+eventtype,d100,86-90,War,,war,,CUSTOM
+eventtype,d100,91-94,Crime,,crime,,CUSTOM
+eventtype,d100,95-97,Arcane matter,,arcane,,CUSTOM
+eventtype,d100,98-100,Weird event,,weird,,CUSTOM
+tragedy,d12,1,A fire destroyed your home or workplace.,,,,CUSTOM
+tragedy,d12,2,You were robbed of something precious.,,,Lost a treasured possession.,CUSTOM
+tragedy,d12,3,A serious illness left you weak for years.,,,Lingering frailty (the DM decides the effect).,CUSTOM
+tragedy,d12,4,A close friend or relative died.,,died,,CUSTOM
+tragedy,d12,5,Someone you trusted betrayed you.,,enemy,,CUSTOM
+tragedy,d12,6,You were driven from your home.,,,,CUSTOM
+tragedy,d12,7,A famine or plague struck your community.,,,,CUSTOM
+tragedy,d12,8,You were captured and held for a time.,,,,CUSTOM
+tragedy,d12,9,You were falsely accused of something.,,,,CUSTOM
+tragedy,d12,10,A mentor or guardian abandoned you.,,,,CUSTOM
+tragedy,d12,11,A shameful secret about you came out.,,,,CUSTOM
+tragedy,d12,12,You lost nearly everything in one disaster.,,,Starting wealth is reduced (the DM decides).,CUSTOM
+boon,d10,1,You inherited a small sum.,2d6,,,CUSTOM
+boon,d10,2,A patron took an interest in you.,Patron,important,,CUSTOM
+boon,d10,3,A stranger gave you a keepsake.,,,Gain a minor keepsake.,CUSTOM
+boon,d10,4,A rescued traveler rewarded you.,4d6,,,CUSTOM
+boon,d10,5,You made a name for yourself locally.,,,,CUSTOM
+boon,d10,6,You learned a valuable secret.,,,,CUSTOM
+boon,d10,7,You found a lucky charm.,,,Gain a lucky charm (the DM decides if it has any effect).,CUSTOM
+boon,d10,8,A kindness you did was repaid by a lasting friend.,,friend,,CUSTOM
+boon,d10,9,An expert trained you for a while.,,,Possible extra skill or tool proficiency (the DM decides).,CUSTOM
+boon,d10,10,You came into a modest windfall.,6d6,,,CUSTOM
+love,d10,1-2,"You fell in love, but it ended in heartbreak.",,ex,,CUSTOM
+love,d10,3-4,You fell in love and are still together.,,lover,,CUSTOM
+love,d10,5-6,You married and built a life together.,,spouse,,CUSTOM
+love,d10,7,You lost the love of your life.,,lost,,CUSTOM
+love,d10,8-9,You had a child with someone you loved.,,child,,CUSTOM
+love,d10,10,A secret romance shaped your life.,,lover,,CUSTOM
+enemy,d6,1,You made an enemy of a rival you once humiliated.,,enemy,,CUSTOM
+enemy,d6,2,A jealous former friend now works against you.,,enemy,,CUSTOM
+enemy,d6,3,A creditor holds a grudge against you.,,enemy,,CUSTOM
+enemy,d6,4,You wronged someone by accident and they never forgave you.,,enemy,,CUSTOM
+enemy,d6,5,A rival family wants revenge on you.,,enemy,,CUSTOM
+enemy,d6,6,You offended a powerful figure.,,enemy,,CUSTOM
+friend,d6,1,You made a friend working side by side.,,friend,,CUSTOM
+friend,d6,2,A fellow traveler became a close friend.,,friend,,CUSTOM
+friend,d6,3,A stranger who helped you stayed in your life.,,friend,,CUSTOM
+friend,d6,4,A childhood rival became a friend.,,friend,,CUSTOM
+friend,d6,5,You shared a hardship and bonded for life.,,friend,,CUSTOM
+friend,d6,6,A teacher became a lasting friend.,,friend,,CUSTOM
+job,d6,1,You worked as a farmhand.,2d6,,,CUSTOM
+job,d6,2,You worked as an apprentice in a trade.,2d6,,,CUSTOM
+job,d6,3,You worked as a courier.,2d6,,,CUSTOM
+job,d6,4,You worked guard shifts.,2d6,,,CUSTOM
+job,d6,5,You worked in a tavern or kitchen.,2d6,,,CUSTOM
+job,d6,6,You worked on a caravan.,2d6,,,CUSTOM
+important,d8,1,You came to know a noble.,Noble,important,,CUSTOM
+important,d8,2,You came to know a guildmaster.,Guildmaster,important,,CUSTOM
+important,d8,3,You came to know a high priest.,High priest,important,,CUSTOM
+important,d8,4,You came to know an army officer.,Army officer,important,,CUSTOM
+important,d8,5,You came to know a famed scholar.,Famed scholar,important,,CUSTOM
+important,d8,6,You came to know a crime boss.,Crime boss,important,,CUSTOM
+important,d8,7,You came to know a wizard or sage.,Wizard or sage,important,,CUSTOM
+important,d8,8,You came to know a merchant prince.,Merchant prince,important,,CUSTOM
+adventure,d100,1-10,You explored an old ruin.,,,,CUSTOM
+adventure,d100,11-20,You escorted a caravan through danger.,,,,CUSTOM
+adventure,d100,21-30,You hunted a dangerous beast.,,,,CUSTOM
+adventure,d100,31-40,You were lost in the wild for weeks.,,,,CUSTOM
+adventure,d100,41-50,You survived a storm at sea.,,,,CUSTOM
+adventure,d100,51-60,You joined a treasure hunt that came up empty.,,,,CUSTOM
+adventure,d100,61-70,You found a hidden cache.,4d6,,,CUSTOM
+adventure,d100,71-80,You survived an ambush.,,,,CUSTOM
+adventure,d100,81-90,You guided a lost noble home.,3d6,,,CUSTOM
+adventure,d100,91-100,You discovered a place few people know about.,,,,CUSTOM
+supernatural,d100,1-10,A ghost touched your life.,,,,CUSTOM
+supernatural,d100,11-20,A fey creature granted you a strange favor.,,,Fey favor or debt (the DM decides).,CUSTOM
+supernatural,d100,21-30,You saw a vision of the future.,,,,CUSTOM
+supernatural,d100,31-40,A fiend tempted you with a bargain.,,,Possible pact or temptation (the DM decides).,CUSTOM
+supernatural,d100,41-50,You were blessed by a divine presence.,,,Minor blessing (the DM decides).,CUSTOM
+supernatural,d100,51-60,A witch cursed you.,,,Cursed: the DM decides the effect.,CUSTOM
+supernatural,d100,61-70,You survived something that should have killed you.,,,,CUSTOM
+supernatural,d100,71-80,A spirit follows you.,,,,CUSTOM
+supernatural,d100,81-90,You were possessed for a time.,,,,CUSTOM
+supernatural,d100,91-100,You met a being of great power.,,,,CUSTOM
+war,d12,1-2,You served as a foot soldier.,,,,CUSTOM
+war,d12,3-4,You served as a scout.,,,,CUSTOM
+war,d12,5-6,You served as a medic.,,,,CUSTOM
+war,d12,7-8,You were conscripted against your will.,,,,CUSTOM
+war,d12,9-10,You fought as a mercenary.,,,,CUSTOM
+war,d12,11-12,You commanded a small unit.,,,,CUSTOM
+warout,d12,1-2,Your side lost and you barely escaped.,,,Old injury or scar (the DM decides).,CUSTOM
+warout,d12,3-4,It ended in a bitter stalemate.,,,,CUSTOM
+warout,d12,5-8,"Your side won, at a cost.",,,,CUSTOM
+warout,d12,9-10,You were decorated.,,,Gain a medal or token of recognition.,CUSTOM
+warout,d12,11,You deserted.,,,,CUSTOM
+warout,d12,12,You became a legend in your unit.,,,,CUSTOM
+crime,d8,1,You stole from a rich merchant.,,,,CUSTOM
+crime,d8,2,You smuggled goods.,,,,CUSTOM
+crime,d8,3,You were caught in a brawl that turned deadly.,,,,CUSTOM
+crime,d8,4,You forged documents.,,,,CUSTOM
+crime,d8,5,You took the blame for a friend.,,,,CUSTOM
+crime,d8,6,You trespassed on sacred ground.,,,,CUSTOM
+crime,d8,7,You acted as a lookout for a gang.,,,,CUSTOM
+crime,d8,8,You blackmailed a local official.,,,,CUSTOM
+punishment,d12,1-6,You were never caught.,,,,CUSTOM
+punishment,d12,7-8,You paid a heavy fine.,,,Lost some savings.,CUSTOM
+punishment,d12,9-10,You spent time in jail.,,,A criminal record may follow you.,CUSTOM
+punishment,d12,11,You were branded or marked.,,,A visible mark (the DM decides).,CUSTOM
+punishment,d12,12,You were exiled.,,,Banned from a place (the DM decides).,CUSTOM
+arcane,d10,1,You watched a wizard at work and were fascinated.,,,,CUSTOM
+arcane,d10,2,You were healed by powerful magic.,,,,CUSTOM
+arcane,d10,3,A spell changed you slightly.,,,A minor lingering magical effect (the DM decides).,CUSTOM
+arcane,d10,4,You were taught a small magical trick.,,,Possible minor magical trick (the DM decides).,CUSTOM
+arcane,d10,5,You were enchanted for a time.,,,,CUSTOM
+arcane,d10,6,You found a spellbook you could not read.,,,,CUSTOM
+arcane,d10,7,You were teleported somewhere far away.,,,,CUSTOM
+arcane,d10,8,You were a test subject for a mage.,,,,CUSTOM
+arcane,d10,9,You witnessed a magical disaster.,,,,CUSTOM
+arcane,d10,10,You were given a magic trinket.,,,Gain a minor magic trinket (the DM decides).,CUSTOM
+weird,d12,1,You were abducted for a night and remember nothing.,,,,CUSTOM
+weird,d12,2,A talking animal spoke to you once.,,,,CUSTOM
+weird,d12,3,You were struck by lightning and lived.,,,,CUSTOM
+weird,d12,4,You woke in a place you had never been.,,,,CUSTOM
+weird,d12,5,A stranger knew your name and warned you.,,,,CUSTOM
+weird,d12,6,You ate something strange and dreamed vividly for a year.,,,,CUSTOM
+weird,d12,7,You were mistaken for someone else.,,,,CUSTOM
+weird,d12,8,A stray beast adopted you.,,,,CUSTOM
+weird,d12,9,You found a door that was gone the next day.,,,,CUSTOM
+weird,d12,10,You gained a fortune and lost it in one night.,,,,CUSTOM
+weird,d12,11,You took part in a ritual you do not understand.,,,,CUSTOM
+weird,d12,12,You met a double of yourself.,,,,CUSTOM
