@@ -1,0 +1,25 @@
+﻿species,lineage,weight,source
+Elf,High Elf,38,PHB24
+Elf,Wood Elf,38,PHB24
+Elf,Drow,24,PHB24
+Dragonborn,Black,10,PHB24
+Dragonborn,Blue,10,PHB24
+Dragonborn,Brass,10,PHB24
+Dragonborn,Bronze,10,PHB24
+Dragonborn,Copper,10,PHB24
+Dragonborn,Gold,10,PHB24
+Dragonborn,Green,10,PHB24
+Dragonborn,Red,10,PHB24
+Dragonborn,Silver,10,PHB24
+Dragonborn,White,10,PHB24
+Tiefling,Abyssal,34,PHB24
+Tiefling,Chthonic,33,PHB24
+Tiefling,Infernal,33,PHB24
+Gnome,Forest Gnome,50,PHB24
+Gnome,Rock Gnome,50,PHB24
+Goliath,Cloud,17,PHB24
+Goliath,Fire,17,PHB24
+Goliath,Frost,17,PHB24
+Goliath,Hill,17,PHB24
+Goliath,Stone,16,PHB24
+Goliath,Storm,16,PHB24

@@ -1,0 +1,13 @@
+﻿class,source,Human,Elf,Dwarf,Halfling,Dragonborn,Tiefling,Gnome,Orc,Aasimar,Goliath
+Barbarian,PHB24,8,3,14,3,10,4,2,25,4,22
+Bard,PHB24,8,9,4,10,7,11,10,3,9,3
+Cleric,PHB24,9,7,14,9,7,5,7,8,17,10
+Druid,PHB24,7,9,4,8,3,3,13,5,6,8
+Fighter,PHB24,12,9,18,7,15,6,5,18,8,17
+Monk,PHB24,7,7,7,8,8,4,4,6,8,10
+Paladin,PHB24,8,4,12,3,12,6,2,8,22,9
+Ranger,PHB24,8,13,7,9,5,4,9,12,5,11
+Rogue,PHB24,10,11,6,18,5,12,12,6,3,3
+Sorcerer,PHB24,7,7,3,6,16,17,9,3,8,3
+Warlock,PHB24,7,6,5,7,6,20,6,3,4,2
+Wizard,PHB24,9,15,6,12,6,8,21,3,6,2

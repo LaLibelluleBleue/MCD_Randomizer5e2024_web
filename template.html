@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Randomizer5e2024</title>
+<style>
+:root{--bg:#e8eef0;--fg:#1c2a33;--card:#fbfdfd;--acc:#0e6670;--gold:#a8741a;--mut:#6b7f8a;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#121c22;--fg:#dbe7ec;--card:#1b2a32;--acc:#5ec4cf;--gold:#e0b050;--mut:#8aa0ab}}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 Palatino,"Palatino Linotype",Georgia,serif}
+main{max-width:560px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:2em;margin:.2em 0 .4em;color:var(--acc)}
+h2{font-size:1.15em;margin:0 0 .4em}
+.card{background:var(--card);border:1px solid var(--mut);border-radius:12px;padding:16px;margin:14px 0}
+button{font:inherit;background:var(--acc);color:var(--bg);border:0;border-radius:8px;padding:12px 18px;margin:4px 6px 4px 0;cursor:pointer}
+button.alt{background:none;color:var(--acc);border:1px solid var(--acc)}
+input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--mut);border-radius:6px;padding:8px;width:3.6em;margin:2px 4px 2px 0;box-sizing:border-box}
+input.d{width:2.8em;text-align:center}
+input.nm{width:100%;font-size:1.6em;font-weight:bold;margin-bottom:8px}
+.sub{color:var(--mut);margin:0 0 10px}
+dl{margin:10px 0;display:grid;grid-template-columns:7em 1fr;gap:4px}dt{color:var(--mut)}dd{margin:0;font-weight:bold}
+.arr{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.die{width:54px;height:54px;border:2px solid var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6em;font-weight:bold;color:var(--gold)}
+table{border-collapse:collapse;font-size:13px;margin:8px 0 20px}td,th{border:1px solid var(--mut);padding:2px 6px;text-align:left}
+.sc{overflow-x:auto}
+#er{color:#c0392b;margin:0}
+.nr{display:flex;gap:8px;align-items:center;margin-bottom:8px}.nr input.nm{width:auto;flex:1;min-width:0;margin:0}button.sm{font-size:.62em;padding:6px 8px;margin:0;line-height:1.2;flex:none}
+@media print{button{display:none}body{background:#fff;color:#000}.card{border:0}.pb{break-before:page}}
+</style></head><body><main><h1>Randomizer5e2024</h1><div id="app"></div><p id="ver" style="color:var(--mut);font-size:12px"></p></main>
+<script>
+/* Randomizer5e2024 app code. The DATA line is filled in by build.py from the CSV files in /data.
+   To change odds, names or sources: edit the CSVs, then run build.py. */
+const DATA=/*DATA*/null;
+const D=DATA,APP=D.app+" v"+D.version;
+const $=i=>document.getElementById(i),app=$("app");
+$("ver").textContent=APP;
+const rnd=n=>1+Math.floor(Math.random()*n);
+// Weights are relative; a d100 roll is scaled across them. Entries are [name, weight, source].
+const pick=(t,r)=>{const s=t.reduce((a,x)=>a+x[1],0),x=Math.ceil(r*s/100);let c=0;for(const e of t){c+=e[1];if(x<=c)return e}return t[t.length-1]};
+const stamp=t=>APP+" | "+new Date().toISOString()+" | "+t;
+let cnt=0;
+
+function home(){
+ app.innerHTML='<div class="card"><h2>Start</h2><button id="bn">Create new character</button><button id="bl" class="alt">Load existing character</button></div>';
+ $("bn").onclick=chooseMode;$("bl").onclick=loadScreen;
+}
+function chooseMode(){
+ app.innerHTML='<div class="card"><h2>How do you want to roll?</h2><button id="bp">Physical dice</button><button id="bd">Let the app roll</button><button id="bb" class="alt">Back</button></div>';
+ $("bp").onclick=()=>gen("p");$("bd").onclick=()=>gen("d");$("bb").onclick=home;
+}
+function loadScreen(){
+ app.innerHTML='<div class="card"><h2>Load a saved character</h2><p>Choose a log file saved by this app:</p><input type="file" id="fi" accept=".txt,text/plain" style="width:100%"><p>Or paste its contents:</p><textarea id="ta" rows="5" style="width:100%;box-sizing:border-box"></textarea><p><button id="go">Load</button><button id="bb" class="alt">Back</button></p><p id="er"></p></div>';
+ $("bb").onclick=home;
+ $("fi").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(load)};
+ $("go").onclick=()=>load($("ta").value);
+}
+function load(t){
+ let c;
+ try{
+  t=t.replace(/\r\n/g,"\n");
+  const m=t.match(/=== CHARACTER DATA[^\n]*\n([\s\S]*)$/),l=t.match(/=== LOG ===\n([\s\S]*?)\n\n=== FINAL CHARACTER ===/);
+  c=JSON.parse(m[1].trim());c.lg=l?l[1].split("\n"):[];
+  if(!c.spn||!c.arr)throw 0;
+ }catch(e){const er=$("er");if(er)er.textContent="That does not look like a character file saved by this app.";return}
+ c.lg.push("","--- "+stamp("character reloaded")+" ---");
+ show(c);
+}
+
+// Ask for physical dice results. k = how many numbers to enter (1 for a d100, 4 for 4d6).
+function ask(sides,k){return new Promise(res=>{
+ const cl=sides==100?"":' class="d"';
+ app.innerHTML='<div class="card"><h2>Roll '+(++cnt)+'</h2><p>'+(k==1?"Roll a d100.":"Roll 4d6 and enter the four dice.")+'</p>'+('<input type="text" inputmode="numeric" maxlength="'+(sides==100?3:1)+'"'+cl+'>').repeat(k)+'<p><button id="ok">Enter</button></p><p id="er"></p></div>';
+ const ins=[...app.querySelectorAll("input")];ins[0].focus();
+ if(sides==6)ins.forEach((el,i)=>el.oninput=()=>{if(!/^[1-6]$/.test(el.value)){el.value="";return}(ins[i+1]||$("ok")).focus()});
+ $("ok").onclick=()=>{
+  const v=ins.map(i=>i.value.trim()),ok=v.every(x=>/^\d+$/.test(x)&&(sides==100?+x<=100:+x>=1&&+x<=sides));
+  if(!ok){$("er").textContent="Enter whole numbers from "+(sides==100?"1 to 100 (00 counts as 100)":"1 to "+sides)+".";return}
+  res(v.map(x=>+x||sides));};
+});}
+
+async function gen(mode){
+ cnt=0;const raw=[],lg=[stamp(mode=="p"?"physical dice":"app-generated")];
+ const R=async()=>{const v=mode=="p"?(await ask(100,1))[0]:rnd(100);raw.push(v);return v};
+ const L=(r,w,e)=>lg.push("d100 = "+r+"  -> "+w+": "+e[0]+(e[2]?" ("+e[2]+")":""));
+ let r=await R();const sp=pick(D.species,r);L(r,"species",sp);
+ let lin=null;const ls=D.lin[sp[0]]||[];
+ if(ls.length){r=await R();lin=pick(ls,r);L(r,"lineage",lin)}
+ r=await R();const sx=pick(D.sex,r);lg.push("d100 = "+r+"  -> sex: "+sx[0]);
+ r=await R();const cl=pick(D.cls.map(c=>[c.n,c.w[sp[0]]||0,c.s]),r);L(r,"class ("+sp[0]+" table)",cl);
+ r=await R();const bg=pick(D.bg,r);L(r,"origin",bg);
+ const arr=[];
+ for(let i=0;i<6;i++){
+  const d=mode=="p"?await ask(6,4):[rnd(6),rnd(6),rnd(6),rnd(6)];
+  raw.push(d.join(""));const s=[...d].sort((a,b)=>a-b);arr.push(s[1]+s[2]+s[3]);
+  lg.push("4d6 = "+d.join(", ")+"  drop "+s[0]+"  -> "+arr[i]);
+ }
+ arr.sort((a,b)=>b-a);
+ lg.push("Random array (sorted): "+arr.join(", "));
+ const c={spn:sp[0],lin:lin?lin[0]:"",cls:cl[0],bg:bg[0],arr,sex:sx[0],src:{sp:sp[2],lin:lin?lin[2]:"",cls:cl[2],bg:bg[2]},code:raw.join("-"),lg};
+ lg.push("Roll code: "+c.code);
+ c.name=newName(c);
+ show(c);
+}
+
+function newName(c){
+ const N=D.names[c.spn],lg=c.lg;let l=c.sex;
+ if(l=="X"){const t=rnd(100);l=t<=50?"F":"M";lg.push("App d100 = "+t+"  -> name list for X: "+l)}
+ const pk=(a,w)=>{const x=rnd(100),n=a[(x-1)%a.length];lg.push("App d100 = "+x+"  -> "+w+": "+n);return n};
+ let nm=pk(N[l],"first name");
+ if((N.S||[]).length)nm+=" "+pk(N.S,"family/clan name");
+ return nm;
+}
+
+function sync(c){const v=$("nm").value.trim();if(v&&v!=c.name){c.lg.push("Name changed manually: "+c.name+" -> "+v);c.name=v}}
+
+function out(c){
+ sync(c);const d=Object.assign({},c);delete d.lg;d.app=D.app;d.ver=D.version;const s=c.src||{};
+ return "=== LOG ===\n"+c.lg.join("\n")+"\n\n=== FINAL CHARACTER ===\nGenerated by "+APP+"\nName: "+c.name+"\nSex: "+c.sex
+ +"\nSpecies: "+c.spn+(c.lin?" ("+c.lin+")":"")+" ["+(s.sp||"")+"]\nClass: "+c.cls+" ["+(s.cls||"")+"]\nOrigin: "+c.bg+" ["+(s.bg||"")+"]\nRandom array: "+c.arr.join(", ")
+ +"\n\n=== CHARACTER DATA (used when loading this file; do not edit) ===\n"+JSON.stringify(d)+"\n";
+}
+
+async function copy(t){
+ try{await navigator.clipboard.writeText(t);return true}
+ catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(x){}a.remove();return ok}
+}
+
+function show(c){
+ app.innerHTML='<div class="card"><div class="nr"><input id="nm" class="nm" aria-label="Name"><button id="rn" class="alt sm">Random<br>rename</button></div>'
+ +'<dl><dt>Species</dt><dd>'+c.spn+(c.lin?" ("+c.lin+")":"")+'</dd><dt>Class</dt><dd>'+c.cls+'</dd><dt>Origin</dt><dd>'+c.bg+'</dd><dt>Sex</dt><dd>'+c.sex+'</dd></dl>'
+ +'<div>Random array</div><div class="arr">'+c.arr.map(x=>'<div class="die">'+x+'</div>').join("")+'</div></div>'
+ +'<button id="dl" class="alt">Download log</button><button id="cp" class="alt">Copy log</button><button id="again">New character</button> <span id="msg" class="sub"></span>'
+ +(/FBAN|FBAV|FB_IAB|Messenger|Instagram/i.test(navigator.userAgent)?'<p class="sub">Downloads may not work in this in-app browser. Use Copy log, or open the link in Chrome or Safari.</p>':"");
+ $("nm").value=c.name;
+ $("rn").onclick=()=>{sync(c);c.lg.push("(name re-rolled)");c.name=newName(c);$("nm").value=c.name};
+ $("dl").onclick=()=>{const t=out(c),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));a.download=(c.name.replace(/[\\/:*?"<>|\s]+/g,"")||"toon")+".txt";a.click()};
+ $("cp").onclick=async()=>{$("msg").textContent=(await copy(out(c)))?"Copied":"Copy failed - try Download"};
+ $("again").onclick=home;
+}
+
+// ---- Printable tables: open this page with #tables (rolls) or #names (name lists) on the address ----
+const f2=n=>n==100?"100":String(n).padStart(2,"0");
+function rngs(t){const m=new Map();for(let r=1;r<=100;r++){const e=pick(t,r),a=m.get(e);a?a[1]=r:m.set(e,[r,r])}
+ return t.map(e=>{const a=m.get(e);return a?(a[0]==a[1]?f2(a[0]):f2(a[0])+"\u2013"+f2(a[1])):"\u2014"})}
+const T=(h,rows)=>'<table><tr>'+h.map(x=>'<th>'+x+'</th>').join("")+'</tr>'+rows.map(r=>'<tr>'+r.map(x=>'<td>'+x+'</td>').join("")+'</tr>').join("")+'</table>';
+function tables(){
+ const sp=D.species,rs=rngs(sp),rb=rngs(D.bg),rx=rngs(D.sex),lr=[];
+ sp.forEach(s=>{const ls=D.lin[s[0]]||[],r=rngs(ls);ls.forEach((l,i)=>lr.push([s[0],r[i],l[0],l[2]]))});
+ const g=sp.map(s=>rngs(D.cls.map(c=>[c.n,c.w[s[0]]||0])));
+ app.innerHTML='<button onclick="window.print()">Print / save as PDF</button><p class="sub">'+APP+'. Roll a d100 on each table (00 = 100). Order: species, lineage (if any), sex, class, origin, then six times 4d6 drop the lowest die.</p>'
+ +'<h2>1. Species</h2>'+T(["d100","Species","Source"],sp.map((s,i)=>[rs[i],s[0],s[2]]))
+ +'<h2>2. Lineage</h2>'+T(["Species","d100","Lineage","Source"],lr)
+ +'<h2>3. Sex</h2>'+T(["d100","Sex"],D.sex.map((s,i)=>[rx[i],s[0]]))
+ +'<h2>4. Class (column = your species)</h2><div class="sc">'+T(["Class"].concat(sp.map(s=>s[0].slice(0,4))).concat(["Src"]),D.cls.map((c,i)=>[c.n].concat(g.map(x=>x[i])).concat([c.s])))+'</div>'
+ +'<h2>5. Origin</h2>'+T(["d100","Origin","Source"],D.bg.map((b,i)=>[rb[i],b[0],b[2]]));
+}
+function names(){
+ let h='<button onclick="window.print()">Print / save as PDF</button><p class="sub">'+APP+'. Name lists: roll a d100 for each column (00 = 100).</p>';
+ for(const s of D.species){const N=D.names[s[0]],S=N.S||[];
+  h+='<h2 class="pb">'+s[0]+' names</h2><table><tr><th>d100</th><th>Female</th><th>Male</th>'+(S.length?'<th>Family / clan</th>':"")+'</tr>';
+  for(let i=0;i<100;i++)h+='<tr><td>'+(i+1)+'</td><td>'+(N.F[i]||"")+'</td><td>'+(N.M[i]||"")+'</td>'+(S.length?'<td>'+(S[i]||"")+'</td>':"")+'</tr>';
+  h+='</table>';}
+ app.innerHTML=h;
+}
+const H=location.hash;
+H=="#tables"?tables():H=="#names"?names():home();
+</script></body></html>
