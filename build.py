@@ -13,7 +13,7 @@ and ignored. Save CSVs as "CSV UTF-8" so accents survive.
 import csv, json, math, pathlib, re, sys
 
 APP = "Randomizer5e2024"
-VERSION = "1.2.1"
+VERSION = "1.2.11"
 
 here = pathlib.Path(__file__).resolve().parent
 data = here / "data"
@@ -132,8 +132,12 @@ hyb = []
 if (data / "hybrids.csv").exists():
     hyb = [[r["species_a"].strip(), r["species_b"].strip(), r["child_species"].strip()] for r in rows("hybrids.csv")]
 
+odds = {}
+if (data / "odds.csv").exists():
+    odds = {r["key"].strip(): num(r["same_species_pct"]) for r in rows("odds.csv")}
+
 payload = {"app": APP, "version": VERSION, "sources": sources, "species": species, "lin": lin,
-           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb}
+           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds}
 blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 template = (here / "template.html").read_text(encoding="utf-8")
