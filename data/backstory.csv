@@ -58,10 +58,10 @@ agebracket,d100,82-90,Mature,1d8,41-50,CUSTOM
 agebracket,d100,91-96,Middle-aged,1d10,51-60,CUSTOM
 agebracket,d100,97-99,Elder,1d12,61-70,CUSTOM
 agebracket,d100,100,Venerable,1d12,71-80,CUSTOM
-occupation,d100,1-5,Adventurer,,adventurer,CUSTOM
-occupation,d100,6-15,Farmer or herder,,,CUSTOM
-occupation,d100,16-25,Craftsperson or artisan,,,CUSTOM
-occupation,d100,26-35,Merchant or shopkeeper,,,CUSTOM
+occupation,d100,1-10,Adventurer,,adventurer,CUSTOM
+occupation,d100,11-18,Farmer or herder,,,CUSTOM
+occupation,d100,19-26,Craftsperson or artisan,,,CUSTOM
+occupation,d100,27-35,Merchant or shopkeeper,,,CUSTOM
 occupation,d100,36-42,Laborer or dockworker,,,CUSTOM
 occupation,d100,43-50,Soldier or guard,,,CUSTOM
 occupation,d100,51-57,Servant or innkeeper's help,,,CUSTOM
