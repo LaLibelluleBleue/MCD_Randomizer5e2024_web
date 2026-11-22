@@ -1,4 +1,4 @@
-﻿table,dice,roll,result,value,tag,note,source
+table,dice,roll,result,value,tag,note,source
 eventtype,d100,1-10,Tragedy,,tragedy,,CUSTOM
 eventtype,d100,11-20,Boon,,boon,,CUSTOM
 eventtype,d100,21-30,Love,,love,,CUSTOM
@@ -133,3 +133,19 @@ weird,d12,9,You found a door that was gone the next day.,,,,CUSTOM
 weird,d12,10,You gained a fortune and lost it in one night.,,,,CUSTOM
 weird,d12,11,You took part in a ritual you do not understand.,,,,CUSTOM
 weird,d12,12,You met a double of yourself.,,,,CUSTOM
+Dhampir,d12,1,You made the choice to become a Dhampir and transitioned with the help of your Sire.,,Sire,,CUSTOM
+Dhampir,d12,2-9,"You were savagely attacked by a stranger, and upon waking went through the transformation process alone.",,,,CUSTOM
+Dhampir,d12,10-11,You were turned into a Dhampir against your will.,,Sire,,CUSTOM
+Dhampir,d12,12,You do not remember how you became a Dhampir.,,,,CUSTOM
+Hexblood,d12,1,"Through a dark blood-sacrifice ritual, you were transformed into what you are today against your will.",,Hag,,CUSTOM
+Hexblood,d12,2-11,You made a deal with a powerful hag to become a Hexblood.,,Hag,,CUSTOM
+Hexblood,d12,12,A strange and incomprehensible arcane anomaly infused you with eldritch energy and permanently transformed you into a Hexbloob.,,,,CUSTOM
+Lupin,d12,1,You made the choice to become a Lupin and transitioned with the help of your Alpha.,,Alpha,,CUSTOM
+Lupin,d12,2-11,"You were savagely attacked by a stranger, and upon waking went through the transformation process alone.",,,,CUSTOM
+Lupin,d12,12,You do not remember how you became a Lupin.,,,,CUSTOM
+Reborn,d12,1,"You were at the center of a very powerful magic spell that went wrong, and since than have been trapped in this half-life state.",,,,CUSTOM
+Reborn,d12,2-3,"You were killed in combat, and 3 days later awoke in the muddy battlefield.",,,,CUSTOM
+Reborn,d12,4-6,"Your death was perfectly normal, until a mage experimenting with necromancy brought you back.",,Necromancer,,CUSTOM
+Reborn,d12,7-9,You are not really one person at all. A deranged necromancer created you by assembling mis-matched bits and pieces from multiple cadavers.,,"Necromancer,Amnesia",,CUSTOM
+Reborn,d12,10,Yo do not remember the circonstances of your first death or how/why you were reborn.,,,,CUSTOM
+Reborn,d12,11-12,You do not remember who you were or why you are here.,,Amnesia,,CUSTOM

@@ -1,4 +1,4 @@
-﻿origin,weight,source
+origin,weight,source
 Acolyte,6,PHB24
 Artisan,6,PHB24
 Charlatan,6,PHB24
@@ -15,3 +15,43 @@ Sailor,6,PHB24
 Scribe,6,PHB24
 Soldier,7,PHB24
 Wayfarer,7,PHB24
+Aberrant Heir,0,EfotA
+Archaeologist,1,EfotA
+House Agent,0,EfotA
+House Cannith Heir,0,EfotA
+House Deneith Heir,0,EfotA
+House Ghallanda Heir,0,EfotA
+House Jorasco Heir,0,EfotA
+House Kundarak Heir,0,EfotA
+House Lyrandar Heir,0,EfotA
+House Medani Heir,0,EfotA
+House Orien Heir,0,EfotA
+House Phiarlan Heir,0,EfotA
+House Sivis Heir,0,EfotA
+House Tharashk Heir,0,EfotA
+House Thuranni Heir,0,EfotA
+House Vadalis Heir,0,EfotA
+Inquisitive,1,EfotA
+Agent of the Ninth Quill,0,AU
+Arcane Smuggler,1,CUSTOM
+Bejeweled Conclave Spy,0,AU
+Spy,1,CUSTOM
+Cosmic Dawn Experiment,0,AU
+Experiment,1,CUSTOM
+Covenent of the Grave Recruit,0,AU
+Necromancy Apprentice,1,CUSTOM
+Crucible Storm Chaser,0,AU
+Storm Chaser,1,CUSTOM
+Familiar Trainer,1,AU
+Horizon Weaver Initiate,0,AU
+Teleporter,1,CUSTOM
+Phantasmic Circus Trouper,0,AU
+Circus Worker,1,CUSTOM
+Seer Apprentice,0,AU
+Oracle Apprentice,1,CUSTOM
+Ward of the Sheltering Hands,0,AU
+Volunteer,1,CUSTOM
+Haunted One,1,RtHW
+Investigator,1,RtHW
+Mist Wanderer,1,RtHW
+Spirit Medium,1,RtHW
