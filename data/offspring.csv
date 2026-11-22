@@ -1,0 +1,12 @@
+﻿parent_a,parent_b,child,weight,note
+Human,Elf,Khoravar,100,a couple with no row has a child of their own species (same species) or none (different species)
+Khoravar,Human,Khoravar,50,
+Khoravar,Human,Human,50,
+Khoravar,Elf,Khoravar,50,
+Khoravar,Elf,Elf,50,
+Aasimar,Human,Aasimar,50,
+Aasimar,Human,Human,50,
+Tiefling,Human,Tiefling,50,
+Tiefling,Human,Human,50,
+Kalashtar,Human,Kalashtar,50,
+Kalashtar,Human,Human,50,

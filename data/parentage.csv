@@ -1,0 +1,12 @@
+﻿species,parent_a,parent_b,weight,note
+Aasimar,Aasimar,Aasimar,50,weights are relative
+Aasimar,Aasimar,Human,48,
+Aasimar,Human,Human,2,rare: celestial spark in two human parents
+Tiefling,Tiefling,Tiefling,50,
+Tiefling,Tiefling,Human,48,
+Tiefling,Human,Human,2,rare: dormant infernal ancestry in two human parents
+Khoravar,Human,Elf,40,
+Khoravar,Khoravar,Human,30,
+Khoravar,Khoravar,Elf,30,
+Kalashtar,Kalashtar,Kalashtar,60,"my guess, please adjust"
+Kalashtar,Kalashtar,Human,40,"my guess, please adjust"

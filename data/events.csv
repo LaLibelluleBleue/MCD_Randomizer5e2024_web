@@ -1,17 +1,17 @@
 table,dice,roll,result,value,tag,note,source
-eventtype,d100,1-10,Tragedy,,tragedy,,CUSTOM
-eventtype,d100,11-20,Boon,,boon,,CUSTOM
-eventtype,d100,21-30,Love,,love,,CUSTOM
-eventtype,d100,31-40,Enemy,,enemy,,CUSTOM
-eventtype,d100,41-50,Friend,,friend,,CUSTOM
-eventtype,d100,51-60,Job,,job,,CUSTOM
-eventtype,d100,61-70,Important contact,,important,,CUSTOM
-eventtype,d100,71-80,Adventure,,adventure,,CUSTOM
-eventtype,d100,81-85,Supernatural event,,supernatural,,CUSTOM
-eventtype,d100,86-90,War,,war,,CUSTOM
-eventtype,d100,91-94,Crime,,crime,,CUSTOM
-eventtype,d100,95-97,Arcane matter,,arcane,,CUSTOM
-eventtype,d100,98-100,Weird event,,weird,,CUSTOM
+eventtype,d100,1-10,Tragedy,,tragedy,,XgtE
+eventtype,d100,11-20,Boon,,boon,,XgtE
+eventtype,d100,21-30,Love,,love,,XgtE
+eventtype,d100,31-40,Enemy,,enemy,,XgtE
+eventtype,d100,41-50,Friend,,friend,,XgtE
+eventtype,d100,51-70,Job,,job,,XgtE
+eventtype,d100,71-75,Important contact,,important,,XgtE
+eventtype,d100,76-80,Adventure,,adventure,,XgtE
+eventtype,d100,81-85,Supernatural event,,supernatural,,XgtE
+eventtype,d100,86-90,War,,war,,XgtE
+eventtype,d100,91-95,Crime,,crime,,XgtE
+eventtype,d100,96-99,Arcane matter,,arcane,,XgtE
+eventtype,d100,100,Weird event,,weird,,XgtE
 tragedy,d12,1,A fire destroyed your home or workplace.,,,,CUSTOM
 tragedy,d12,2,You were robbed of something precious.,,,Lost a treasured possession.,CUSTOM
 tragedy,d12,3,A serious illness left you weak for years.,,,Lingering frailty (the DM decides the effect).,CUSTOM
@@ -66,16 +66,17 @@ important,d8,5,You came to know a famed scholar.,Famed scholar,important,,CUSTOM
 important,d8,6,You came to know a crime boss.,Crime boss,important,,CUSTOM
 important,d8,7,You came to know a wizard or sage.,Wizard or sage,important,,CUSTOM
 important,d8,8,You came to know a merchant prince.,Merchant prince,important,,CUSTOM
-adventure,d100,1-10,You explored an old ruin.,,,,CUSTOM
-adventure,d100,11-20,You escorted a caravan through danger.,,,,CUSTOM
-adventure,d100,21-30,You hunted a dangerous beast.,,,,CUSTOM
-adventure,d100,31-40,You were lost in the wild for weeks.,,,,CUSTOM
-adventure,d100,41-50,You survived a storm at sea.,,,,CUSTOM
-adventure,d100,51-60,You joined a treasure hunt that came up empty.,,,,CUSTOM
-adventure,d100,61-70,You found a hidden cache.,4d6,,,CUSTOM
-adventure,d100,71-80,You survived an ambush.,,,,CUSTOM
-adventure,d100,81-90,You guided a lost noble home.,3d6,,,CUSTOM
-adventure,d100,91-100,You discovered a place few people know about.,,,,CUSTOM
+adventure,d100,1-10,"You nearly died. You have nasty scars on your body, and you are missing an ear, 1d3 fingers, or 1d4 toes.",,,,XgtE
+adventure,d100,11-20,"You suffered a grievous injury. Although the wound healed, it still pains you from time to time.",,,,XgtE
+adventure,d100,21-30,"You were wounded, but in time you fully recovered.",,,,XgtE
+adventure,d100,31-40,"You contracter a disease while exploring a filthy warren. You recovered, but have a persistent cough, pockmarks on your skin, or premature gray hair.",,,,XgtE
+adventure,d100,41-50,"You were poisoned by a trap or monster. You recovered, but you now have disadvantage on saving throws against being poisoned.",,poison,,XgtE
+adventure,d100,51-60,You lost something of sentimental value to you during your adventure.,,,,XgtE
+adventure,d100,61-70,"You were terribly frightened by something you encountered and ran away, abandoning your companions to their fate.",,,,XgtE
+adventure,d100,71-80,You learned a great deal during your adventure. Gain proficiency in one skill.,,skill,,XgtE
+adventure,d100,81-90,You found some treasure and still have some left from your share of it.,3d6,,,XgtE
+adventure,d100,91-99,You found a considerable amount of treasure on your adventure.,1d20+50,,,XgtE
+adventure,d100,0,You came across a common magic item (of the DM's choice).,,item,,XgtE
 supernatural,d100,1-10,A ghost touched your life.,,,,CUSTOM
 supernatural,d100,11-20,A fey creature granted you a strange favor.,,,Fey favor or debt (the DM decides).,CUSTOM
 supernatural,d100,21-30,You saw a vision of the future.,,,,CUSTOM
