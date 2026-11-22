@@ -48,7 +48,7 @@ const rnd=n=>1+Math.floor(Math.random()*n);
 // Weights are relative; a d100 roll is scaled across them. Entries are [name, weight, source].
 const pick=(t,r)=>{const s=t.reduce((a,x)=>a+x[1],0),x=Math.ceil(r*s/100);let c=0;for(const e of t){c+=e[1];if(x<=c)return e}return t[t.length-1]};
 const stamp=t=>APP+" | "+new Date().toISOString()+" | "+t;
-let cnt=0,USED=new Set(),NOADV=false;
+let cnt=0,USED=new Set(),NOADV=false,FS={};
 function bump(){try{const k="r5e24_gen",n=(+localStorage.getItem(k)||0)+1;localStorage.setItem(k,n);return n}catch(e){return null}}
 
 // ---- Backstory engine (v1.2). Tables come from data/backstory.csv; all rolls are made by the app. ----
@@ -71,11 +71,11 @@ const linFor=s=>{const l=D.lin[s]||[];return l.length?pick(l,rnd(100))[0]:""};
 const sexFor=()=>pick(D.sex,rnd(100))[0];
 const famOf=c=>c.fam||((D.names[bsp(c)].S||[]).length?c.name.split(" ").pop():"");
 const anySp=c=>rnd(100)<=50?c.spn:pick(D.species,rnd(100))[0];
-function usedInit(c){USED=new Set([c.name]);if(MAIN&&MAIN.ent)Object.values(allChars()).forEach(r=>{USED.add(r.name);((r.bs&&r.bs.people)||[]).forEach(p=>USED.add(p.name))})}
+function usedInit(c){FS={};USED=new Set([c.name]);if(MAIN&&MAIN.ent)Object.values(allChars()).forEach(r=>{USED.add(r.name);((r.bs&&r.bs.people)||[]).forEach(p=>USED.add(p.name))})}
 function nameFor(c,s,sex,share){let n;for(let t=0;t<10;t++){n=nameOnce(c,s,sex,share);if(!USED.has(n))break}return n}
 function nameOnce(c,s,sex,share){
  const N=D.names[s],l=sex=="X"?(rnd(2)==1?"F":"M"):sex,L=N[l].length?N[l]:(N[l=="F"?"M":"F"].length?N[l=="F"?"M":"F"]:D.names.Human[l]);let n=L[(rnd(100)-1)%L.length];
- if((N.S||[]).length)n+=" "+(share&&s==bsp(c)&&famOf(c)?famOf(c):N.S[(rnd(100)-1)%N.S.length]);
+ if((N.S||[]).length)n+=" "+(share&&s==bsp(c)&&famOf(c)?famOf(c):share?(FS[s]||(FS[s]=N.S[(rnd(100)-1)%N.S.length])):N.S[(rnd(100)-1)%N.S.length]);
  return n;
 }
 // One routine builds every secondary character.
@@ -153,7 +153,7 @@ function events(c,n,lg,ppl,imp,K,lone,TR){
    }else{
     const child=wed&&cur().length>0&&!(K&&K.kids&&K.kids.length)&&coin("Later love event: a child with a current partner rather than a new lover");
     if(child){
-     const x=cur()[rnd(cur().length)-1],cs=x.same?null:(x.p.spn==c.spn?c.spn:HYB(c.spn,x.p.spn));
+     const x=cur()[rnd(cur().length)-1],cs=x.same?null:childSp(c.spn,x.p.spn);
      if(cs){const kd=mk("Child",{spn:cs,sex:sexFor(),h:Math.max(1,c.h-e.eh),lin:cs==c.spn?c.lin:linFor(cs),share:true});kd.other=x.p.id;text="You had a child with "+x.p.name+"."}
      else{lg.push("No child possible for this couple");text="You and "+x.p.name+" hoped for a child, but this couple could not have one."}
     }else if(cur().length&&coin("New lover kept secret from the current partner")){
@@ -178,6 +178,8 @@ function sibLine(c,L){
  return"You are the "+ordn(older+1)+" of "+(L.length+1)+" children"+(tw==1?", and you have a twin":tw>1?", and you are one of a set of "+(tw==2?"triplets":"multiples"):"")+".";
 }
 function pickInit(cur){const t=D.species.filter(x=>x[0]!=cur&&!(D.turn&&D.turn[x[0]]>0));const sp=pick(t.length?t:D.species,rnd(100))[0];return{spn:sp,lin:linFor(sp)}}
+// What species can a child of this couple be? Rows in offspring.csv; otherwise the couple's own species (same species) or none.
+function childSp(a,b){const r=(D.off||[]).filter(x=>(x[0]==a&&x[1]==b)||(x[0]==b&&x[1]==a));if(r.length)return pick(r.map(x=>[x[2],x[3]]),rnd(100))[0];return a==b?a:null}
 function outSp(c,kind){
  const pct=D.odds&&D.odds[kind]!=null?D.odds[kind]:100;let s=c.spn;
  if(rnd(100)>pct){const t=D.species.filter(x=>x[0]!=c.spn);if(t.length)s=pick(t,rnd(100))[0]}
@@ -208,29 +210,32 @@ function backstory0(c,inh,K,lone){
   const bp=bt("birthplace",lg);let pr=KP?{txt:"You know who your parents were.",tag:"known"}:bt("parents",lg);
   const known=pr.tag=="known";
   if(KP)lg.push("Parents already exist in the entourage: "+K.parents.map(p=>p.name).join(" and ")+" (not generated again).");
-  let tag="same",ptxt="";const pk="parentage_"+bsp(c).toLowerCase();
-  if(known&&!KP&&D.bt[pk]){const r=bt(pk,lg,0,"parentage");tag=r.tag;ptxt=" "+r.txt}
+  let tag="same",ptxt="",PP=[bsp(c),bsp(c)];const pk="parentage_"+bsp(c).toLowerCase(),prow=D.par&&D.par[bsp(c)];
+  if(known&&!KP&&prow&&prow.length){
+   const e=pick(prow.map(x=>[x[0]+" + "+x[1],x[2],x[0],x[1]]),rnd(100));PP=[e[2],e[3]];if(rnd(2)==1)PP.reverse();lg.push("Parents' species: "+PP.join(" + "));
+   ptxt=PP[0]==PP[1]?(PP[0]==bsp(c)?"":" Both of your parents were "+PP[0].toLowerCase()+"."):" One of your parents was "+an(PP[0])+" "+PP[0].toLowerCase()+" and the other "+an(PP[1])+" "+PP[1].toLowerCase()+".";
+  }else if(known&&!KP&&D.bt[pk]){const r=bt(pk,lg,0,"parentage");tag=r.tag;ptxt=" "+r.txt;if(tag=="human")PP=["Human","Human"];else if(tag=="mixed"){PP=[bsp(c),bsp(c)];PP[rnd(2)-1]="Human"}}
   let fm=bt("family",lg,0,"raised by"),n=0;
   while(((!known&&["both","mother","father"].includes(fm.tag))||(KP&&["mother","father"].includes(fm.tag)))&&n++<30)fm=bt("family",lg,0,"raised by (re-roll: parents unknown)");
   let ab=null,abw="";
   if(known&&(fm.tag=="mother"||fm.tag=="father")){ab=bt("absent",lg,0,"absent parent");abw=fm.tag=="mother"?"Father":"Mother"}
   if(KP)ppl.push(...K.parents.map(p=>Object.assign({},p)));
   if(known&&!KP){
-   const sp=[bsp(c),bsp(c)];if(tag=="human")sp[0]=sp[1]="Human";else if(tag=="mixed")sp[rnd(2)-1]="Human";
-   [["Mother","F",sp[0]],["Father","M",sp[1]]].forEach(([rel,sex,s])=>ppl.push(npc(c,rel,{spn:s,sex,h:c.h+17+rnd(14),share:true,lin:s==bsp(c)?bln(c):"",status:abw==rel?ab.val:null},lg)));
+   const sp=PP;
+   [["Mother","F",sp[0]],["Father","M",sp[1]]].forEach(([rel,sex,s])=>ppl.push(npc(c,rel,{spn:s,sex,h:c.h+17+rnd(14),share:true,lin:s==bsp(c)?bln(c):linFor(s),status:abw==rel?ab.val:null},lg)));
   }
   const kin=fm.tag;
-  if(kin=="grandparent")ppl.push(npc(c,"Grandparent",{spn:bsp(c),lin:bln(c),sex:sexFor(),h:c.h+42+rnd(18),share:true},lg));
-  if(kin=="relative"){const sx=sexFor();ppl.push(npc(c,sx=="M"?"Uncle":sx=="F"?"Aunt":"Aunt or uncle",{spn:bsp(c),lin:bln(c),sex:sx,h:c.h+8+rnd(16),share:true},lg))}
+  if(kin=="grandparent"){const ks=PP[rnd(2)-1];ppl.push(npc(c,"Grandparent",{spn:ks,lin:ks==bsp(c)?bln(c):linFor(ks),sex:sexFor(),h:c.h+42+rnd(18),share:true},lg))}
+  if(kin=="relative"){const sx=sexFor(),ks=PP[rnd(2)-1];ppl.push(npc(c,sx=="M"?"Uncle":sx=="F"?"Aunt":"Aunt or uncle",{spn:ks,lin:ks==bsp(c)?bln(c):linFor(ks),sex:sx,h:c.h+8+rnd(16),share:true},lg))}
   if(kin=="mentor"){const mo=outSp(c,"Mentor");lg.push("Mentor species: "+(mo.spn==c.spn?"same":"different ("+mo.spn+")"));ppl.push(npc(c,"Mentor",{spn:mo.spn,lin:mo.lin,att:"Friendly"},lg))}
   let sb=KS?{txt:"",val:"0"}:bt("siblings",lg),sn=KS?{p:[0],t:0}:dice(sb.val);const sl=[];
   if(!KS)lg.push("Number of siblings: "+sb.val+" = "+sn.p.join("+")+" = "+sn.t);
   if(KS){K.sibs.forEach(p=>{ppl.push(Object.assign({},p));sl.push(p)});lg.push("Siblings already exist in the entourage: "+(sl.length||"none")+" (not generated again).")}
   for(let i=1;i<=sn.t;i++){
-   const bo=bt("birthorder",lg,0,"sibling "+i+" birth order"),sx=sexFor();
+   const bo=bt("birthorder",lg,0,"sibling "+i+" birth order"),sx=sexFor(),ss=childSp(PP[0],PP[1])||bsp(c);
    const h=bo.tag=="twin"?c.h:bo.tag=="older"?c.h+rnd(6):Math.max(1,c.h-rnd(6));
    const w=sx=="M"?"brother":sx=="F"?"sister":"sibling";
-   const p=npc(c,(bo.tag=="twin"?"Twin ":bo.tag=="older"?"Older ":"Younger ")+w,{sex:sx,h,share:true,spn:bsp(c),lin:bln(c)},lg);ppl.push(p);sl.push(p);
+   const p=npc(c,(bo.tag=="twin"?"Twin ":bo.tag=="older"?"Older ":"Younger ")+w,{sex:sx,h,share:true,spn:ss,lin:ss==bsp(c)?bln(c):linFor(ss)},lg);ppl.push(p);sl.push(p);
   }
   const ls=bt("lifestyle",lg),ch=bt("childhome",lg,+ls.val||0,"childhood home");
   F={bp,pr,ptxt,fm,ab,abw,ls,ch};sibTxt=sibLine(c,sl);

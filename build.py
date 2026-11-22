@@ -13,7 +13,7 @@ and ignored. Save CSVs as "CSV UTF-8" so accents survive.
 import csv, json, math, pathlib, re, sys
 
 APP = "Randomizer5e2024"
-VERSION = "1.3"
+VERSION = "1.3.1"
 IMMORTAL_SCALE = 1000   # years used to scale ages of species whose lifespan is "immortal" (display only; they never die of old age)
 
 here = pathlib.Path(__file__).resolve().parent
@@ -151,8 +151,32 @@ odds = {}
 if (data / "odds.csv").exists():
     odds = {r["key"].strip(): num(r["same_species_pct"]) for r in rows("odds.csv")}
 
+# ---- Parentage (who a character's parents can be) and offspring (what species a couple's child can be) ----
+par, off = {}, []
+known_sp = set(sp_names)
+if (data / "parentage.csv").exists():
+    for r in rows("parentage.csv"):
+        names3 = [r["species"].strip(), r["parent_a"].strip(), r["parent_b"].strip()]
+        for n_ in names3:
+            if n_ not in known_sp:
+                print("Warning: parentage.csv mentions unknown species '%s'" % n_)
+        par.setdefault(names3[0], []).append([names3[1], names3[2], num(r["weight"])])
+if (data / "offspring.csv").exists():
+    for r in rows("offspring.csv"):
+        trio = [r["parent_a"].strip(), r["parent_b"].strip(), r["child"].strip()]
+        for n_ in trio:
+            if n_ not in known_sp:
+                print("Warning: offspring.csv mentions unknown species '%s'" % n_)
+        off.append(trio + [num(r["weight"])])
+for sp_, lst in par.items():
+    for a_, b_, w_ in lst:
+        if a_ != b_ and not any(((o[0] == a_ and o[1] == b_) or (o[0] == b_ and o[1] == a_)) and o[2] == sp_ for o in off):
+            print("Warning: %s parents %s + %s: offspring.csv has no row letting that couple have a %s child" % (sp_, a_, b_, sp_))
+if (data / "hybrids.csv").exists():
+    print("Note: hybrids.csv is no longer used; put couples and their children in offspring.csv")
+
 payload = {"app": APP, "version": VERSION, "sources": sources, "species": species, "lin": lin,
-           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds, "turn": turn}
+           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds, "turn": turn, "par": par, "off": off}
 blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 template = (here / "template.html").read_text(encoding="utf-8")
