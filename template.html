@@ -48,7 +48,7 @@ const rnd=n=>1+Math.floor(Math.random()*n);
 // Weights are relative; a d100 roll is scaled across them. Entries are [name, weight, source].
 const pick=(t,r)=>{const s=t.reduce((a,x)=>a+x[1],0),x=Math.ceil(r*s/100);let c=0;for(const e of t){c+=e[1];if(x<=c)return e}return t[t.length-1]};
 const stamp=t=>APP+" | "+new Date().toISOString()+" | "+t;
-let cnt=0,USED=new Set();
+let cnt=0,USED=new Set(),NOADV=false;
 function bump(){try{const k="r5e24_gen",n=(+localStorage.getItem(k)||0)+1;localStorage.setItem(k,n);return n}catch(e){return null}}
 
 // ---- Backstory engine (v1.2). Tables come from data/backstory.csv; all rolls are made by the app. ----
@@ -60,30 +60,35 @@ function bt(name,lg,mod,label){
  return r;
 }
 // Ages are handled in "human-equivalent years" (h) and converted to the species' own years for display.
-const HL=()=>D.age.Human[1];
+const HL=()=>D.age.Human[1],IMM=s=>!!(D.age[s]&&D.age[s][2]);
+const bsp=c=>c.init?c.init.spn:c.spn,bln=c=>c.init?c.init.lin:c.lin,an=s=>/^[AEIOUaeiou]/.test(s)?"an":"a";
 const toSp=(h,sp)=>{const a=D.age[sp]||[18,80];return Math.max(1,Math.round(h<18?h/18*a[0]:a[0]+(h-18)/(HL()-18)*(a[1]-a[0])))};
 const lab=h=>{if(h<11)return"Child";let b=D.bt.agebracket[0];for(const r of D.bt.agebracket)if(h>=+r.tag.split("-")[0])b=r;return b.txt};
 function ageRoll(lg,who){const b=bt("agebracket",lg,0,who+" age bracket"),d=rnd(10),h=+b.tag.split("-")[0]+d-1;lg.push(who+" exact age: 1d10 = "+d+"  -> "+h+" (human-equivalent years)");return{b,h}}
-const classFor=s=>pick(D.cls.map(c=>[c.n,c.w[s]||0,c.s]),rnd(100))[0];
+const clsTab=s=>{const t=D.cls.map(c=>[c.n,c.w[s]||0,c.s]);if(!t.some(x=>x[1]>0))t.forEach(x=>x[1]=1);return t};
+const classFor=s=>pick(clsTab(s),rnd(100))[0];
 const linFor=s=>{const l=D.lin[s]||[];return l.length?pick(l,rnd(100))[0]:""};
 const sexFor=()=>pick(D.sex,rnd(100))[0];
-const famOf=c=>c.fam||((D.names[c.spn].S||[]).length?c.name.split(" ").pop():"");
+const famOf=c=>c.fam||((D.names[bsp(c)].S||[]).length?c.name.split(" ").pop():"");
 const anySp=c=>rnd(100)<=50?c.spn:pick(D.species,rnd(100))[0];
 function usedInit(c){USED=new Set([c.name]);if(MAIN&&MAIN.ent)Object.values(allChars()).forEach(r=>{USED.add(r.name);((r.bs&&r.bs.people)||[]).forEach(p=>USED.add(p.name))})}
 function nameFor(c,s,sex,share){let n;for(let t=0;t<10;t++){n=nameOnce(c,s,sex,share);if(!USED.has(n))break}return n}
 function nameOnce(c,s,sex,share){
- const N=D.names[s],l=sex=="X"?(rnd(2)==1?"F":"M"):sex,L=N[l];let n=L[(rnd(100)-1)%L.length];
- if((N.S||[]).length)n+=" "+(share&&s==c.spn&&famOf(c)?famOf(c):N.S[(rnd(100)-1)%N.S.length]);
+ const N=D.names[s],l=sex=="X"?(rnd(2)==1?"F":"M"):sex,L=N[l].length?N[l]:(N[l=="F"?"M":"F"].length?N[l=="F"?"M":"F"]:D.names.Human[l]);let n=L[(rnd(100)-1)%L.length];
+ if((N.S||[]).length)n+=" "+(share&&s==bsp(c)&&famOf(c)?famOf(c):N.S[(rnd(100)-1)%N.S.length]);
  return n;
 }
 // One routine builds every secondary character.
 function npc(c,rel,o,lg){
  const s=o.spn||c.spn,sex=o.sex||sexFor(),p={rel,spn:s,sex,lin:o.lin!==undefined?o.lin:(s==c.spn?c.lin:linFor(s))};
- p.id=nid();p.h=o.h!=null?o.h:ageRoll(lg,rel).h;p.age=toSp(p.h,s);p.lab=lab(p.h);p.name=nameFor(c,s,sex,o.share);USED.add(p.name);
+ p.id=nid();p.h=o.h!=null?o.h:ageRoll(lg,rel).h;p.age=toSp(p.h,s);p.lab=lab(p.h);
+ const tp=(D.turn&&D.turn[s])||0;
+ if(tp>0&&!o.share&&o.turnable!==false){const t=rnd(100)<=tp;lg.push(rel+" turned into "+s+"? ("+tp+"% chance): "+(t?"yes":"no"));if(t)p.init=pickInit(s)}
+ p.name=nameFor(c,p.init?p.init.spn:s,sex,o.share);USED.add(p.name);
  if(p.h<11&&!o.occ&&!o.adv)p.occ="Child";
  else{
   let adv=null;
-  if(o.adv===true)adv=true;else if(typeof o.adv=="number"){adv=Math.random()<o.adv;lg.push(rel+" adventurer chance "+Math.round(o.adv*100)+"%: "+(adv?"yes":"no"))}
+  if(NOADV)adv=false;else if(o.adv===true)adv=true;else if(typeof o.adv=="number"){adv=Math.random()<o.adv;lg.push(rel+" adventurer chance "+Math.round(o.adv*100)+"%: "+(adv?"yes":"no"))}
   if(adv===true){p.occ="Adventurer";p.cls=classFor(s);lg.push(rel+" is an adventurer; class ("+s+" table): "+p.cls)}
   else if(o.occ)p.occ=o.occ;
   else{let oc=bt("occupation",lg,0,rel+" occupation"),k=0;
@@ -92,25 +97,26 @@ function npc(c,rel,o,lg){
   p.align=bt("alignment",lg,0,rel+" alignment").txt}
  p.att=o.att||bt("attitude",lg,0,rel+" attitude").txt;
  let st=o.status;
- if(!st){if(p.h>HL())st="Dead (old age)";else{const r=bt("status",lg,0,rel+" status");st=r.tag=="dead"?"Dead":r.tag=="missing"?"Missing":r.txt}}
- if(st=="Dead")st="Dead ("+bt("deathcause",lg,0,rel+" cause of death").txt+")";
+ if(!st){if(p.h>HL()&&!IMM(s))st="Dead (old age)";else{const r=bt("status",lg,0,rel+" status");st=r.tag=="dead"?"Dead":r.tag=="missing"?"Missing":r.txt}}
+ if(st=="Dead"){let dc=bt("deathcause",lg,0,rel+" cause of death"),z=0;while(IMM(s)&&/old age/i.test(dc.txt)&&z++<30)dc=bt("deathcause",lg,0,rel+" cause of death (re-roll)");st="Dead ("+dc.txt+")"}
  p.status=st;return p;
 }
-const pl=p=>p.name+" - "+p.rel+". "+p.spn+(p.lin?" ("+p.lin+")":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+p.occ+(p.cls?" ("+p.cls+")":"")+"."+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".";
+const pl=p=>p.name+" - "+p.rel+". "+p.spn+(p.lin?" ("+p.lin+")":"")+(p.init?" [born "+p.init.spn+"]":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+p.occ+(p.cls?" ("+p.cls+")":"")+"."+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".";
 
 // ---- Life events (v1.2.1). Tables come from data/events.csv; partner rules use hybrids.csv. ----
 const CHAIN={war:"warout",crime:"punishment"};
 const HYB=(a,b)=>{const h=(D.hyb||[]).find(x=>(x[0]==a&&x[1]==b)||(x[0]==b&&x[1]==a));return h?h[2]:null};
-function events(c,n,lg,ppl,imp,K,lone){
+function events(c,n,lg,ppl,imp,K,lone,TR){
  // Pass 1: roll every event (type, age, result). Pass 2: apply them in time order (people, love rules, gold, notes).
  const ev=[];
  const makes=(k,rs)=>k=="love"||["friend","enemy","important"].includes(k)||rs.some(x=>["friend","enemy","important","died"].includes(x.tag));
  for(let i=1;i<=n;i++){
   let et,k,eh,rs,z=0;
   do{et=bt("eventtype",lg,0,"life event "+i+" type"+(z?" (loner: re-roll)":""));k=et.tag;const lo=k=="love"?Math.min(c.h,16):8;eh=lo+Math.floor(Math.random()*(c.h-lo+1));rs=[];
-   if(k!="love"){rs.push(bt(k,lg,0,et.txt+" result"));if(CHAIN[k])rs.push(bt(CHAIN[k],lg,0,CHAIN[k]))}z++}while(lone&&z<500&&makes(k,rs));
+   if(k!="love"){rs.push(bt(k,lg,0,et.txt+" result"));if(CHAIN[k])rs.push(bt(CHAIN[k],lg,0,CHAIN[k]))}z++}while(false);
   ev.push({et,k,eh,rs});
  }
+ if(TR){const lo2=Math.min(c.h,16);ev.push({et:{txt:"Transformation"},k:"turn",eh:lo2+Math.floor(Math.random()*(c.h-lo2+1)),rs:[TR]})}
  ev.sort((a,b)=>a.eh-b.eh);
  const out=[],parts=[];let loves=0;
  if(K&&K.partners&&K.partners.length){K.partners.forEach(p=>parts.push({p,same:false,diff:false}));loves=1}
@@ -122,11 +128,13 @@ function events(c,n,lg,ppl,imp,K,lone){
   }
   const mk=(rel,o)=>{const p=npc(c,rel,o,lg);ppl.push(p);names.push(p.name+", "+rel.toLowerCase());return p};
   const spx=kind=>{const o=outSp(c,kind);lg.push(kind+" species: "+(o.spn==c.spn?"same":"different ("+o.spn+")")+" ("+(D.odds&&D.odds[kind]!=null?D.odds[kind]:100)+"% same)");return o};
-  const r=e.rs[0],t=r&&r.tag,coin=(why)=>{const v=rnd(2)==1;lg.push(why+": "+(v?"yes":"no")+" (coin flip)");return v};
+  const r=e.rs[0],tg=r&&r.tag?r.tag.split(",").map(x=>x.trim()):[],t=tg[0],coin=(why)=>{const v=rnd(2)==1;lg.push(why+": "+(v?"yes":"no")+" (coin flip)");return v};
+  const acq=(rel,sp)=>mk(rel,Object.assign({adv:0.5},sp?{spn:sp,lin:linFor(sp)}:spx("Important contact")));
+  if(tg.includes("Sire"))acq("Sire","Dhampir");if(tg.includes("Hag"))acq("Hag","Hexblood");if(tg.includes("Alpha"))acq("Alpha","Lupin");if(tg.includes("Necromancer"))acq("Necromancer");
   if(t=="friend")mk("Friend",Object.assign({att:"Friendly",adv:true},spx("Friend")));
   else if(t=="enemy")mk("Enemy",Object.assign({att:"Hostile",adv:true},spx("Enemy")));
   else if(t=="important")mk("Important contact",Object.assign({occ:r.val,adv:0.5},spx("Important contact")));
-  else if(t=="died")mk("Lost loved one",{status:"Dead"});
+  else if(t=="died")mk("Lost loved one",{status:"Dead",turnable:false});
   else if(e.k=="love"){
    const wed=c.h>=18,cur=()=>parts.filter(x=>!/^Ex/.test(x.p.rel));
    const partner=rel=>{
@@ -169,6 +177,7 @@ function sibLine(c,L){
  const older=L.filter(p=>p.h>c.h).length,tw=L.filter(p=>p.h==c.h).length;
  return"You are the "+ordn(older+1)+" of "+(L.length+1)+" children"+(tw==1?", and you have a twin":tw>1?", and you are one of a set of "+(tw==2?"triplets":"multiples"):"")+".";
 }
+function pickInit(cur){const t=D.species.filter(x=>x[0]!=cur&&!(D.turn&&D.turn[x[0]]>0));const sp=pick(t.length?t:D.species,rnd(100))[0];return{spn:sp,lin:linFor(sp)}}
 function outSp(c,kind){
  const pct=D.odds&&D.odds[kind]!=null?D.odds[kind]:100;let s=c.spn;
  if(rnd(100)>pct){const t=D.species.filter(x=>x[0]!=c.spn);if(t.length)s=pick(t,rnd(100))[0]}
@@ -176,7 +185,8 @@ function outSp(c,kind){
 }
 function brk(h){let b=D.bt.agebracket[0];for(const r of D.bt.agebracket)if(h>=+r.tag.split("-")[0])b=r;return b}
 // c = the character (main toon or a developed entourage member). inh = inherited family facts (for siblings).
-function backstory(c,inh,K,lone){
+function backstory(c,inh,K,lone){NOADV=!!lone;try{return backstory0(c,inh,K,lone)}finally{NOADV=false}}
+function backstory0(c,inh,K,lone){
  usedInit(c);
  const lg=c.lg,ppl=[],B=[],imp=[];lg.push("","--- Backstory: "+stamp("generated")+" ---");
  let a;
@@ -185,58 +195,62 @@ function backstory(c,inh,K,lone){
  c.h=a.h;c.bracket=a.b.txt;
  const ne=dice(a.b.val);lg.push("Number of life events: "+a.b.val+" = "+ne.p.join("+")+" = "+ne.t);
  if(!c.align)c.align=bt("alignment",lg,0,"alignment").txt;
+ let TR=null;
+ if(c.init)TR=D.bt[c.spn]?bt(c.spn,lg,0,"how you became "+an(c.spn)+" "+c.spn):{txt:"You were turned into "+an(c.spn)+" "+c.spn+".",tag:"",val:"",note:""};
+ const amn=!!TR&&(TR.tag||"").split(",").map(x=>x.trim()).includes("Amnesia");
  let F,sibTxt;
  if(inh){
   F=inh.f;ppl.push(...inh.people);
   sibTxt=sibLine(c,inh.sibs);
   lg.push("Family facts inherited from "+inh.from+".");
- }else{
+ }else if(amn){F=null;sibTxt="";lg.push("Amnesia: birth, parents, upbringing and siblings are not generated.")}else{
   const KP=!!(K&&K.parents.length),KS=KP||!!(K&&K.sibs.length);
   const bp=bt("birthplace",lg);let pr=KP?{txt:"You know who your parents were.",tag:"known"}:bt("parents",lg);
-  if(lone&&!KP){let z=0;while(pr.tag=="known"&&z++<500)pr=bt("parents",lg,0,"parents (loner: re-roll)")}
   const known=pr.tag=="known";
   if(KP)lg.push("Parents already exist in the entourage: "+K.parents.map(p=>p.name).join(" and ")+" (not generated again).");
-  let tag="same",ptxt="";const pk="parentage_"+c.spn.toLowerCase();
+  let tag="same",ptxt="";const pk="parentage_"+bsp(c).toLowerCase();
   if(known&&!KP&&D.bt[pk]){const r=bt(pk,lg,0,"parentage");tag=r.tag;ptxt=" "+r.txt}
   let fm=bt("family",lg,0,"raised by"),n=0;
   while(((!known&&["both","mother","father"].includes(fm.tag))||(KP&&["mother","father"].includes(fm.tag)))&&n++<30)fm=bt("family",lg,0,"raised by (re-roll: parents unknown)");
-  if(lone){let z=0;while((KP?["grandparent","relative","mentor"]:["both","mother","father","grandparent","relative","mentor"]).includes(fm.tag)&&z++<500)fm=bt("family",lg,0,"raised by (loner: re-roll)")}
   let ab=null,abw="";
   if(known&&(fm.tag=="mother"||fm.tag=="father")){ab=bt("absent",lg,0,"absent parent");abw=fm.tag=="mother"?"Father":"Mother"}
   if(KP)ppl.push(...K.parents.map(p=>Object.assign({},p)));
   if(known&&!KP){
-   const sp=[c.spn,c.spn];if(tag=="human")sp[0]=sp[1]="Human";else if(tag=="mixed")sp[rnd(2)-1]="Human";
-   [["Mother","F",sp[0]],["Father","M",sp[1]]].forEach(([rel,sex,s])=>ppl.push(npc(c,rel,{spn:s,sex,h:c.h+17+rnd(14),share:true,lin:s==c.spn?c.lin:"",status:abw==rel?ab.val:null},lg)));
+   const sp=[bsp(c),bsp(c)];if(tag=="human")sp[0]=sp[1]="Human";else if(tag=="mixed")sp[rnd(2)-1]="Human";
+   [["Mother","F",sp[0]],["Father","M",sp[1]]].forEach(([rel,sex,s])=>ppl.push(npc(c,rel,{spn:s,sex,h:c.h+17+rnd(14),share:true,lin:s==bsp(c)?bln(c):"",status:abw==rel?ab.val:null},lg)));
   }
   const kin=fm.tag;
-  if(kin=="grandparent")ppl.push(npc(c,"Grandparent",{sex:sexFor(),h:c.h+42+rnd(18),share:true},lg));
-  if(kin=="relative"){const sx=sexFor();ppl.push(npc(c,sx=="M"?"Uncle":sx=="F"?"Aunt":"Aunt or uncle",{sex:sx,h:c.h+8+rnd(16),share:true},lg))}
+  if(kin=="grandparent")ppl.push(npc(c,"Grandparent",{spn:bsp(c),lin:bln(c),sex:sexFor(),h:c.h+42+rnd(18),share:true},lg));
+  if(kin=="relative"){const sx=sexFor();ppl.push(npc(c,sx=="M"?"Uncle":sx=="F"?"Aunt":"Aunt or uncle",{spn:bsp(c),lin:bln(c),sex:sx,h:c.h+8+rnd(16),share:true},lg))}
   if(kin=="mentor"){const mo=outSp(c,"Mentor");lg.push("Mentor species: "+(mo.spn==c.spn?"same":"different ("+mo.spn+")"));ppl.push(npc(c,"Mentor",{spn:mo.spn,lin:mo.lin,att:"Friendly"},lg))}
   let sb=KS?{txt:"",val:"0"}:bt("siblings",lg),sn=KS?{p:[0],t:0}:dice(sb.val);const sl=[];
-  if(lone&&!KS){let z=0;while(sn.t>0&&z++<500){sb=bt("siblings",lg,0,"siblings (loner: re-roll)");sn=dice(sb.val)}}
   if(!KS)lg.push("Number of siblings: "+sb.val+" = "+sn.p.join("+")+" = "+sn.t);
   if(KS){K.sibs.forEach(p=>{ppl.push(Object.assign({},p));sl.push(p)});lg.push("Siblings already exist in the entourage: "+(sl.length||"none")+" (not generated again).")}
   for(let i=1;i<=sn.t;i++){
    const bo=bt("birthorder",lg,0,"sibling "+i+" birth order"),sx=sexFor();
    const h=bo.tag=="twin"?c.h:bo.tag=="older"?c.h+rnd(6):Math.max(1,c.h-rnd(6));
    const w=sx=="M"?"brother":sx=="F"?"sister":"sibling";
-   const p=npc(c,(bo.tag=="twin"?"Twin ":bo.tag=="older"?"Older ":"Younger ")+w,{sex:sx,h,share:true,lin:c.lin},lg);ppl.push(p);sl.push(p);
+   const p=npc(c,(bo.tag=="twin"?"Twin ":bo.tag=="older"?"Older ":"Younger ")+w,{sex:sx,h,share:true,spn:bsp(c),lin:bln(c)},lg);ppl.push(p);sl.push(p);
   }
   const ls=bt("lifestyle",lg),ch=bt("childhome",lg,+ls.val||0,"childhood home");
   F={bp,pr,ptxt,fm,ab,abw,ls,ch};sibTxt=sibLine(c,sl);
  }
  B.push("Age: "+c.age+" ("+c.bracket+").");
- B.push("Birth and parents: "+F.bp.txt+" "+F.pr.txt+F.ptxt);
- B.push("Siblings: "+sibTxt);
- B.push("Upbringing: "+F.fm.txt+(F.ab?" Your "+F.abw.toLowerCase()+" "+F.ab.txt:""));
- B.push("Childhood: "+F.ls.txt+" "+F.ch.txt);
+ if(c.init)B.push("Species: You were born "+an(c.init.spn)+" "+c.init.spn+(c.init.lin?" ("+c.init.lin+")":"")+" and were later turned into "+an(c.spn)+" "+c.spn+".");
+ if(amn)B.push("Childhood: You do not remember who you were as a child, or where you came from.");
+ else{
+  B.push("Birth and parents: "+F.bp.txt+" "+F.pr.txt+F.ptxt);
+  B.push("Siblings: "+sibTxt);
+  B.push("Upbringing: "+F.fm.txt+(F.ab?" Your "+F.abw.toLowerCase()+" "+F.ab.txt:""));
+  B.push("Childhood: "+F.ls.txt+" "+F.ch.txt);
+ }
  if(K){ppl.push(...K.kids.map(p=>Object.assign({},p)));ppl.push(...K.partners.map(p=>Object.assign({},p)));if(K.kids.length||K.partners.length)lg.push("Children and partners already exist in the entourage (not generated again).")}
- const ev=events(c,ne.t,lg,ppl,imp,K,lone);
+ const ev=events(c,ne.t,lg,ppl,imp,K,lone,TR);
  B.push("Life events:\n"+ev.join("\n"));
  return{bio:B.join("\n\n"),people:ppl,imp,events:ne.t,fam:F};
 }
 
-const plh=p=>'<b'+(p.cls?' class="adv"':"")+'>'+esc(p.name+" - "+p.rel+".")+'</b> '+esc(p.spn+(p.lin?" ("+p.lin+")":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+p.occ)+(p.cls?' <span class="adv">('+esc(p.cls)+')</span>':"")+esc("."+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".");
+const plh=p=>'<b'+(p.cls?' class="adv"':"")+'>'+esc(p.name+" - "+p.rel+".")+'</b> '+esc(p.spn+(p.lin?" ("+p.lin+")":"")+(p.init?" [born "+p.init.spn+"]":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+p.occ)+(p.cls?' <span class="adv">('+esc(p.cls)+')</span>':"")+esc("."+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".");
 const bsText=c=>c.bs?"\n\nBIOGRAPHY\n"+c.bs.bio+"\n\nPEOPLE YOU KNOW\n"+c.bs.people.map(pl).join("\n")+"\n\nEFFECTS ON YOUR CHARACTER SHEET\n"+(c.bs.imp.length?c.bs.imp.join("\n"):"(none yet)"):"";
 const esc=s=>String(s).replace(/[&<>"]/g,m=>"&#"+m.charCodeAt(0)+";");
 function renderBS(c){renderBS0(c);renderEnt()}
@@ -298,7 +312,7 @@ async function gen(mode){
  let lin=null;const ls=D.lin[sp[0]]||[];
  if(ls.length){r=await R("Lineage");lin=pick(ls,r);L(r,"lineage",lin)}
  r=await R("Sex");const sx=pick(D.sex,r);lg.push("d100 = "+r+"  -> sex: "+sx[0]);
- r=await R("Class");const cl=pick(D.cls.map(c=>[c.n,c.w[sp[0]]||0,c.s]),r);L(r,"class ("+sp[0]+" table)",cl);
+ r=await R("Class");const cl=pick(clsTab(sp[0]),r);L(r,"class ("+sp[0]+" table)",cl);
  r=await R("Origin");const bg=pick(D.bg,r);L(r,"origin",bg);
  const arr=[];
  for(let i=0;i<6;i++){
@@ -312,12 +326,14 @@ async function gen(mode){
  lg.push("Roll code: "+c.code);
  const dc=bump();c.devCount=dc;lg.splice(1,0,"Characters generated on this device: "+(dc===null?"counter unavailable":dc));
  c.align=bt("alignment",lg,0,"alignment").txt;
+ const tpm=(D.turn&&D.turn[sp[0]])||0;
+ if(tpm>0){const t=rnd(100),yes=t<=tpm;lg.push("App d100 = "+t+"  -> turned into "+sp[0]+"? ("+tpm+"% chance): "+(yes?"yes":"no, born "+sp[0]));if(yes){c.init=pickInit(sp[0]);lg.push("Initial species: "+c.init.spn+(c.init.lin?" ("+c.init.lin+")":""))}}
  c.name=newName(c);
  show(c);
 }
 
 function newName(c){
- const N=D.names[c.spn],lg=c.lg;let l=c.sex;
+ const N=D.names[bsp(c)],lg=c.lg;let l=c.sex;
  if(l=="X"){const t=rnd(100);l=t<=50?"F":"M";lg.push("App d100 = "+t+"  -> name list for X: "+l)}
  const pk=(a,w)=>{const x=rnd(100),n=a[(x-1)%a.length];lg.push("App d100 = "+x+"  -> "+w+": "+n);return n};
  let nm=pk(N[l],"first name");
@@ -363,7 +379,7 @@ const T=(h,rows)=>'<table><tr>'+h.map(x=>'<th>'+x+'</th>').join("")+'</tr>'+rows
 function tables(){
  const sp=D.species,rs=rngs(sp),rb=rngs(D.bg),rx=rngs(D.sex),lr=[];
  sp.forEach(s=>{const ls=D.lin[s[0]]||[],r=rngs(ls);ls.forEach((l,i)=>lr.push([s[0],r[i],l[0],l[2]]))});
- const g=sp.map(s=>rngs(D.cls.map(c=>[c.n,c.w[s[0]]||0])));
+ const g=sp.map(s=>rngs(clsTab(s[0])));
  app.innerHTML='<button onclick="window.print()">Print / save as PDF</button><p class="sub">'+APP+'. Roll a d100 on each table (00 = 100). Order: species, lineage (if any), sex, class, origin, then six times 4d6 drop the lowest die.</p>'
  +'<h2>1. Species</h2>'+T(["d100","Species","Source"],sp.map((s,i)=>[rs[i],s[0],s[2]]))
  +'<h2>2. Lineage</h2>'+T(["Species","d100","Lineage","Source"],lr)
@@ -383,13 +399,13 @@ function names(){
 // ---- Entourage: roster of adventurers, ring map, current-character dropdown ----
 let MAIN=null,W=null;
 const NW=156,NH=74,RG=210;
-const ltype=r=>/Enemy/.test(r)?"enemy":/Friend|Mentor/.test(r)?"friend":/lover|spouse|partner/i.test(r)?"love":/Important/.test(r)?"acq":"fam";
+const ltype=r=>/Enemy/.test(r)?"enemy":/Friend|Mentor/.test(r)?"friend":/lover|spouse|partner/i.test(r)?"love":/Important|Sire|Hag|Alpha|Necromancer/.test(r)?"acq":"fam";
 const LCOL={fam:"var(--fg)",acq:"#999",enemy:"#d33",friend:"#36d",love:"#a2a"},LNAME={fam:"Family / other",acq:"Acquaintance",enemy:"Enemy",friend:"Friend",love:"Spouse / lover"};
 const nid=()=>"p"+(MAIN.seq=(MAIN.seq||0)+1);
 const allChars=()=>Object.assign({pc:MAIN},MAIN.ent.chars);
 function ensureIds(c){Object.values(allChars()).forEach(x=>((x.bs&&x.bs.people)||[]).forEach(p=>{if(!p.id)p.id=nid()}))}
 const sibRx=/(brother|sister|sibling)$/i;
-const selfNpc=(X,id)=>({id:id||X.id||"pc",name:X.name,spn:X.spn,lin:X.lin,sex:X.sex,h:X.h,age:X.age,lab:X.bracket,occ:"Adventurer",cls:X.cls,align:X.align,att:"Friendly",status:"Alive and getting by"});
+const selfNpc=(X,id)=>({id:id||X.id||"pc",name:X.name,spn:X.spn,lin:X.lin,init:X.init,sex:X.sex,h:X.h,age:X.age,lab:X.bracket,occ:"Adventurer",cls:X.cls,align:X.align,att:"Friendly",status:"Alive and getting by"});
 const sibWord=s=>s=="M"?"brother":s=="F"?"sister":"sibling";
 function INV(r,X){
  const s=X.sex;
@@ -402,6 +418,7 @@ function INV(r,X){
  if(/^(Aunt|Uncle)/.test(r))return s=="F"?"Niece":s=="M"?"Nephew":"Niece or nephew";
  if(r=="Mentor")return"Student";
  if(r=="Important contact")return"Acquaintance";
+ if(r=="Sire")return"Progeny";if(r=="Hag")return"Prot\u00e9g\u00e9";if(r=="Alpha")return"Packmate";if(r=="Necromancer")return"Creation";
  return r;
 }
 // Siblings share the family facts of the character who created them.
@@ -415,7 +432,7 @@ function arr4(lg){const a=[];for(let i=0;i<6;i++){const d=[rnd(6),rnd(6),rnd(6),
 function owner(id){const r=allChars();return Object.keys(r).find(k=>r[k].bs&&r[k].bs.people.some(p=>p.id==id))}
 function develop(id,fromId,lone){
  const X=allChars()[fromId],ent=X.bs.people.find(p=>p.id==id),lg=[stamp("developed as a member of the entourage of "+X.name)];
- const rec={id,name:ent.name,spn:ent.spn,lin:ent.lin,sex:ent.sex,cls:ent.cls,align:ent.align,occ:ent.occ,att:ent.att,status:ent.status,h:ent.h,age:ent.age,keep:true,lg};
+ const rec={id,name:ent.name,spn:ent.spn,lin:ent.lin,sex:ent.sex,cls:ent.cls,align:ent.align,occ:ent.occ,att:ent.att,status:ent.status,h:ent.h,age:ent.age,init:ent.init,keep:true,lg};
  lg.push("Sketch: "+ent.name+", "+ent.spn+", "+ent.sex+", age "+ent.age+", "+ent.cls+" (rolled earlier as "+ent.rel.toLowerCase()+" of "+X.name+").");
  const r=rnd(100),bg=pick(D.bg,r);rec.bg=bg[0];lg.push("d100 = "+r+"  -> origin: "+bg[0]+" ("+bg[2]+")");
  rec.arr=arr4(lg);
@@ -423,7 +440,7 @@ function develop(id,fromId,lone){
  rec.src={sp:sp?sp[2]:"",cls:cl?cl.s:"",bg:bg[2]};
  const inh=sibRx.test(ent.rel)&&X.bs.fam?inherit(X,rec):null;
  const K=famKnown(id,ent.h);rec.bs=backstory(rec,inh,K,lone);
- if(lone)lg.push("Developed as a loner: no new characters were created.");
+ if(lone)lg.push("Developed as a loner: no new adventurers were created.");
  if(!inh&&!rec.bs.people.some(p=>p.id==fromId)){const inv=selfNpc(X,fromId);inv.rel=INV(ent.rel,X);rec.bs.people.unshift(inv)}
  MAIN.ent.chars[id]=rec;famSync();return rec;
 }
@@ -683,7 +700,7 @@ function showChar(id){
   +'<div class="card"><h2>Biography</h2><div style="white-space:pre-wrap">'+esc(rec.bs.bio)+'</div></div><div class="card"><h2>People you know</h2>'+rec.bs.people.map(p=>'<p>'+plh(p)+'</p>').join("")+'</div>'
   +'<div class="card"><h2>Effects on your character sheet</h2><p class="sub">'+(rec.bs.imp.length?rec.bs.imp.map(esc).join("<br>"):"Nothing from life events.")+'</p></div>';
  }else{
-  h+='<p class="sub">A sketch. Develop it to roll an origin, a random array and a backstory.</p><button id="dv">Develop this character</button> <button id="dvl" class="alt sm2" title="Roll a backstory that creates no new characters">Develop as loner</button></div>';
+  h+='<p class="sub">A sketch. Develop it to roll an origin, a random array and a backstory.</p><button id="dv">Develop this character</button> <button id="dvl" class="alt sm2" title="Roll a backstory that creates no new adventurers">Develop as loner</button></div>';
  }
  app.innerHTML=h+'<button id="bk" class="alt">Back to '+esc(MAIN.name)+'</button><div style="margin-top:6px"><button id="dl" class="alt">Download log</button><button id="cp" class="alt">Copy log</button><button id="again">New character</button> <span id="msg" class="sub"></span></div>';
  bindActs(MAIN);

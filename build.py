@@ -13,7 +13,8 @@ and ignored. Save CSVs as "CSV UTF-8" so accents survive.
 import csv, json, math, pathlib, re, sys
 
 APP = "Randomizer5e2024"
-VERSION = "1.2.11"
+VERSION = "1.3"
+IMMORTAL_SCALE = 1000   # years used to scale ages of species whose lifespan is "immortal" (display only; they never die of old age)
 
 here = pathlib.Path(__file__).resolve().parent
 data = here / "data"
@@ -47,11 +48,15 @@ bg = [[r["origin"].strip(), num(r["weight"]), r["source"].strip()] for r in rows
 sex = [[r["sex"].strip(), num(r["weight"])] for r in rows("sex.csv")]
 
 names = {s: {"F": [], "M": [], "S": []} for s in sp_names}
-for r in rows("names.csv"):
+for r in sum((rows(p.name) for p in sorted(data.glob("names*.csv"))), []):   # every names*.csv in data/
     sp, lst = r["species"].strip(), r["list"].strip().upper()
     if sp not in names or lst not in ("F", "M", "S"):
         sys.exit("names.csv: bad species or list on row: %s" % dict(r))
     names[sp][lst].append(r["name"].strip())
+
+for _s in sp_names:
+    if not names[_s]["F"] and not names[_s]["M"]:
+        print("Warning: no names for species %s in any names*.csv; Human names will be used for it" % _s)
 
 sources = {r["code"].strip(): r["title"].strip() for r in rows("sources.csv")}
 for table in (species, bg):
@@ -90,6 +95,9 @@ def fix(label, table, wi):
             print("Bumped %s / %s: weight %s -> %s (it had no d100 face)" % (label, table[i][0], old, table[i][wi]))
 
 
+for _s in sp_names:
+    if not any(c["w"].get(_s) for c in cls):
+        print("Warning: no class odds for species %s in classes.csv; every class will be equally likely for it" % _s)
 fix("species", species, 1)
 for _s, _l in lin.items():
     fix("lineage " + _s, _l, 1)
@@ -103,7 +111,14 @@ fix("origins", bg, 1)
 fix("sex", sex, 1)
 
 # ---- Species ages (extra columns in species.csv) ----
-ages = {r["species"].strip(): [num(r.get("adult_age") or 18), num(r.get("lifespan") or 80)] for r in rows("species.csv")}
+ages, turn = {}, {}
+for r in rows("species.csv"):
+    sp_ = r["species"].strip()
+    life = (r.get("lifespan") or "80").strip()
+    immortal = life.lower() == "immortal"
+    ages[sp_] = [num(r.get("adult_age") or 18), IMMORTAL_SCALE if immortal else num(life), 1 if immortal else 0]
+    tv = (r.get("Transformed") or r.get("transformed") or "0").strip()
+    turn[sp_] = num(tv) if tv else 0
 
 # ---- Backstory tables (backstory.csv): real dice and roll ranges, like the book ----
 bt, bd = {}, {}
@@ -137,7 +152,7 @@ if (data / "odds.csv").exists():
     odds = {r["key"].strip(): num(r["same_species_pct"]) for r in rows("odds.csv")}
 
 payload = {"app": APP, "version": VERSION, "sources": sources, "species": species, "lin": lin,
-           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds}
+           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds, "turn": turn}
 blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 template = (here / "template.html").read_text(encoding="utf-8")
