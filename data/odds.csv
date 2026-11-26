@@ -1,0 +1,5 @@
+﻿key,same_species_pct,note
+Friend,60,chance (in %) that a friend from a life event is the same species as the character; otherwise a different species is drawn from the species table
+Enemy,50,
+Important contact,40,
+Mentor,50,

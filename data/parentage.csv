@@ -1,12 +1,17 @@
-﻿species,parent_a,parent_b,weight,note
+species,parent_a,parent_b,weight,note
 Aasimar,Aasimar,Aasimar,50,weights are relative
-Aasimar,Aasimar,Human,48,
-Aasimar,Human,Human,2,rare: celestial spark in two human parents
+Aasimar,Aasimar,Human,40,
+Aasimar,Human,Human,8,rare: celestial spark in two human parents
+Aasimar,Human,Angel,1,rare : the angel is NPC
+Aasimar,Aasimar,Angel,1,rare : the angel is NPC
 Tiefling,Tiefling,Tiefling,50,
-Tiefling,Tiefling,Human,48,
-Tiefling,Human,Human,2,rare: dormant infernal ancestry in two human parents
-Khoravar,Human,Elf,40,
-Khoravar,Khoravar,Human,30,
-Khoravar,Khoravar,Elf,30,
-Kalashtar,Kalashtar,Kalashtar,60,"my guess, please adjust"
-Kalashtar,Kalashtar,Human,40,"my guess, please adjust"
+Tiefling,Tiefling,Human,40,
+Tiefling,Human,Human,8,rare: dormant infernal ancestry in two human parents
+Tiefling,Human,Devil,1,rare : the devil is NPC
+Tiefling,Tiefling,Devil,1,rare : the devil is NPC
+Khoravar,Human,Elf,10,
+Khoravar,Khoravar,Human,20,
+Khoravar,Khoravar,Elf,20,
+Khoravar,Khoravar,Khoravar,50,
+Kalashtar,Kalashtar,Kalashtar,50,
+Kalashtar,Kalashtar,Human,50,

@@ -76,7 +76,7 @@ adventure,d100,61-70,"You were terribly frightened by something you encountered 
 adventure,d100,71-80,You learned a great deal during your adventure. Gain proficiency in one skill.,,skill,,XgtE
 adventure,d100,81-90,You found some treasure and still have some left from your share of it.,3d6,,,XgtE
 adventure,d100,91-99,You found a considerable amount of treasure on your adventure.,1d20+50,,,XgtE
-adventure,d100,0,You came across a common magic item (of the DM's choice).,,item,,XgtE
+adventure,d100,100,You came across a common magic item (of the DM's choice).,,item,,XgtE
 supernatural,d100,1-10,A ghost touched your life.,,,,CUSTOM
 supernatural,d100,11-20,A fey creature granted you a strange favor.,,,Fey favor or debt (the DM decides).,CUSTOM
 supernatural,d100,21-30,You saw a vision of the future.,,,,CUSTOM

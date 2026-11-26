@@ -1,131 +1,123 @@
-table,dice,roll,result,value,tag,source
-parents,d100,1-94,You know who your parents are or were.,,known,XgtE
-parents,d100,95-100,You never knew your parents.,,unknown,XgtE
-parentage_tiefling,d8,1-4,"Both parents were human, their infernal heritage dormant until you came along.",,human,XgtE
-parentage_tiefling,d8,5-6,One parent was a tiefling and the other was a human.,,mixed,XgtE
-parentage_tiefling,d8,7,One parent was a tiefling and the other was a devil.,,devil,XgtE
-parentage_tiefling,d8,8,One parent was a human and the other was a devil.,,devil,XgtE
-parentage_aasimar,d8,1-4,Both of your parents were aasimar.,,same,CUSTOM
-parentage_aasimar,d8,5-6,Both parents were ordinary humans; the celestial spark appeared in you alone.,,human,CUSTOM
-parentage_aasimar,d8,7,One parent was aasimar and the other an Angel.,,angel,CUSTOM
-parentage_aasimar,d8,8,One parent was a human and the other was an Angel,,,CUSTOM
-birthplace,d100,1-50,You were born at home.,,,XgtE
-birthplace,d100,51-55,You were born in the home of a family friend.,,,XgtE
-birthplace,d100,56-63,You were born in the home of a healer or midwife.,,,XgtE
-birthplace,d100,64-65,"You were born in a cart, carriage or wagon.",,,XgtE
-birthplace,d100,66-68,"You were born in a barn, shed, or other outbuilding.",,,XgtE
-birthplace,d100,69-70,You were born in a cave.,,,XgtE
-birthplace,d100,71-72,You were born in a field.,,,XgtE
-birthplace,d100,73-74,You were born in a forest.,,,XgtE
-birthplace,d100,75-77,You were born in a temple.,,,XgtE
-birthplace,d100,78,You were born on a battlefield.,,,XgtE
-birthplace,d100,79-80,You were born in an alley or street.,,,XgtE
-birthplace,d100,81-82,"You were born in an brothel, tavern or inn.",,,XgtE
-birthplace,d100,83-84,"You were born in a castle, keep, tower or palace.",,,XgtE
-birthplace,d100,85,You were born in a sewer or rubbish heap.,,,XgtE
-birthplace,d100,86-88,You were born among people of a different race.,,,XgtE
-birthplace,d100,89-91,You were born on a boat or ship.,,,XgtE
-birthplace,d100,92-93,You were born in a prison or in the headquarters of a secret organization.,,,XgtE
-birthplace,d100,94-95,You were born in a sage's laboratory.,,,XgtE
-birthplace,d100,96,You were born in the feywild.,,,XgtE
-birthplace,d100,97-99,You were born in the shadowfell.,,,XgtE
-birthplace,d100,98-100,You were born on the astral plane or the etheral plane.,,,XgtE
-birthplace,d100,99,You were born on an inner plane of your choice.,,,XgtE
-birthplace,d100,100,You were born on an outer plane of your choice.,,,XgtE
-siblings,d10,1-2,You have no siblings.,0,,XgtE
-siblings,d10,3-4,You have a few siblings.,1d3,,XgtE
-siblings,d10,5-6,You have a number of siblings.,1d4+1,,XgtE
-siblings,d10,7-8,You have a large family of siblings.,1d6+2,,XgtE
-siblings,d10,9-10,You have a great many siblings.,1d8+3,,XgtE
-birthorder,2d6,2,twin,,twin,XgtE
-birthorder,2d6,3-7,older,,older,XgtE
-birthorder,2d6,8-12,younger,,younger,XgtE
-family,d100,1,You grew up on your own.,,orphan,XgtE
-family,d100,2,"You were raised in an institution, such as an asylum.",,institution,XgtE
-family,d100,3,You were raised in a temple.,,institution,XgtE
-family,d100,4-5,You were raised in an orphanage.,,orphan,XgtE
-family,d100,6-7,You were raised by a guardian.,,mentor,XgtE
-family,d100,8-15,You were raised by a relative or extended family such as tribe or clan.,,relative,XgtE
-family,d100,16-25,You were raised by your paternal or maternal grandparents.,,grandparent,XgtE
-family,d100,26-35,You were raised by an adoptive family (same or different race).,,adoption,XgtE
-family,d100,36-55,You were raised by your father alone.,,father,XgtE
-family,d100,56-75,You were raised by your mother alone.,,mother,XgtE
-family,d100,76-100,You were raised by both of your parents.,,both,XgtE
-absent,d4,1,died when you were young.,Dead,dead,XgtE
-absent,d4,2,"was imprisoned, enslaved or otherwise taken away.",Imprisoned,away,XgtE
-absent,d4,3,abandoned you.,Left the family,gone,XgtE
-absent,d4,4,disappeared to an unknown fate..,Missing,missing,XgtE
-lifestyle,3d6,3,Your family lived in wretched poverty.,-40,wretched,XgtE
-lifestyle,3d6,4-5,Your family lived in squalid conditions.,-20,squalid,XgtE
-lifestyle,3d6,6-8,Your family was poor but got by.,-10,poor,XgtE
-lifestyle,3d6,9-12,Your family lived a modest life.,0,modest,XgtE
-lifestyle,3d6,13-15,Your family was comfortable.,10,comfortable,XgtE
-lifestyle,3d6,16-17,Your family was wealthy.,20,wealthy,XgtE
-lifestyle,3d6,18,Your family was rich and powerful.,40,aristocratic,XgtE
-childhome,d100,-40-0,You grew up on the streets.,,,XgtE
-childhome,d100,1-20,You grew up in a rundown shack.,,,XgtE
-childhome,d100,21-30,You had no permanent residence and moved around a lot.,,,XgtE
-childhome,d100,31-40,You grew up in an encampment or village in the wilderness.,,,XgtE
-childhome,d100,41-50,You grew up in an apartment in a rundown neighborhood.,,,XgtE
-childhome,d100,51-70,You grew up in a small house.,,,XgtE
-childhome,d100,71-90,You grew up in a large house.,,,XgtE
-childhome,d100,91-110,You grew up in a mansion.,,,XgtE
-childhome,d100,111-140,You grew up in a palace or castle.,,,XgtE
-childmemories,3d6,3,"You ware still haunted by your childhood, when you were treated badly by your peers.",,,XgtE
-childmemories,3d6,4-5,"You spent most of your childhood alone, with no close friends.",,,XgtE
-childmemories,3d6,6-8,"Others saw you as being different or strange, and so you had few companions.",,,XgtE
-childmemories,3d6,9-12,You had a few close friends and lived an ordinary childhood.,,,XgtE
-childmemories,3d6,13-15,"You had several friends, and your childhood was a generally happy one.",,,XgtE
-childmemories,3d6,16-17,"You always found it easy to make friends, and you loved being around people.",,,XgtE
-childmemories,3d6,18-23,"Everyone knew who you were, and you had friends everywhere you went.",,,XgtE
-agebracket,d100,1-20,Youth,1,11-20,XgtE
-agebracket,d100,21-59,Young adult,1d4,21-30,XgtE
-agebracket,d100,60-69,Adult,1d6,31-40,XgtE
-agebracket,d100,70-89,Mature,1d8,41-50,XgtE
-agebracket,d100,90-99,Middle-aged,1d10,51-60,XgtE
-agebracket,d100,100,Elder,1d12,61-80,XgtE
-occupation,d100,1-5,Academic,,,XgtE
-occupation,d100,6-10,Adventurer,,adventurer,XgtE
-occupation,d100,11,Aristocrat,,,XgtE
-occupation,d100,12-26,Artisan or Guild Member,,,XgtE
-occupation,d100,27-31,Criminal,,,XgtE
-occupation,d100,32-36,Entertainer,,,XgtE
-occupation,d100,37-38,"Exile, Hermit or Refugee",,,XgtE
-occupation,d100,39-43,Explorer or Wanderer,,,XgtE
-occupation,d100,44-55,Farmer or Herder,,,XgtE
-occupation,d100,56-60,Hunter or Trapper,,,XgtE
-occupation,d100,61-75,Laborer,,,XgtE
-occupation,d100,76-80,Merchant,,,XgtE
-occupation,d100,81-85,Politician or Bureaucrat,,,XgtE
-occupation,d100,86-90,Priest,,,XgtE
-occupation,d100,91-95,Sailor,,,XgtE
-occupation,d100,96-100,Soldier,,,XgtE
-alignment,3d6,3,Chaotic Evil or Chaotic Neutral,,,XgtE
-alignment,3d6,4-5,Lawful Evil,,,XgtE
-alignment,3d6,6-8,Neutral Evil,,,XgtE
-alignment,3d6,9-12,Neutral,,,XgtE
-alignment,3d6,13-15,Neutral Good,,,XgtE
-alignment,3d6,16,Lawful Good,,,XgtE
-alignment,3d6,17,Lawful Neutral,,,XgtE
-alignment,3d6,18,Chaotic Good or Chaotic Neutral,,,XgtE
-attitude,3d4,3-4,Hostile,,,XgtE
-attitude,3d4,5-10,Friendly,,,XgtE
-attitude,3d4,11-12,Indifferent,,,XgtE
-status,3d6,3,Dead,,dead,XgtE
-status,3d6,4-5,Missing,,missing,XgtE
-status,3d6,6-8,"Struggling (poor, ill or in trouble)",,,XgtE
-status,3d6,9-12,Alive and Well,,,XgtE
-status,3d6,13-15,Successful,,,XgtE
-status,3d6,16-17,Infamous,,,XgtE
-status,3d6,18,Famous,,,XgtE
-deathcause,d12,1,Unknown,,,XgtE
-deathcause,d12,2,Murdered,,,XgtE
-deathcause,d12,3,Killed in Battle,,,XgtE
-deathcause,d12,4,Accident (work-related),,,XgtE
-deathcause,d12,5,Accident,,,XgtE
-deathcause,d12,6-7,Natural Causes,,,XgtE
-deathcause,d12,8,Apparent Suicide,,,XgtE
-deathcause,d12,9,Natural Disaster or Wild Animals,,,XgtE
-deathcause,d12,10,Consumed by a Monster,,,XgtE
-deathcause,d12,11,Executed or Tortured,,,XgtE
-deathcause,d12,12,Bizarre Event,,,XgtE
+table,dice,roll,result,value,tag,source,note
+parents,d100,1-94,You know who your parents are or were.,,known,XgtE,
+parents,d100,95-100,You never knew your parents.,,unknown,XgtE,
+birthplace,d100,1-50,You were born at home.,,,XgtE,
+birthplace,d100,51-55,You were born in the home of a family friend.,,,XgtE,
+birthplace,d100,56-63,You were born in the home of a healer or midwife.,,,XgtE,
+birthplace,d100,64-65,"You were born in a cart, carriage or wagon.",,,XgtE,
+birthplace,d100,66-68,"You were born in a barn, shed, or other outbuilding.",,,XgtE,
+birthplace,d100,69-70,You were born in a cave.,,,XgtE,
+birthplace,d100,71-72,You were born in a field.,,,XgtE,
+birthplace,d100,73-74,You were born in a forest.,,,XgtE,
+birthplace,d100,75-77,You were born in a temple.,,,XgtE,
+birthplace,d100,78,You were born on a battlefield.,,,XgtE,
+birthplace,d100,79-80,You were born in an alley or street.,,,XgtE,
+birthplace,d100,81-82,"You were born in an brothel, tavern or inn.",,,XgtE,
+birthplace,d100,83-84,"You were born in a castle, keep, tower or palace.",,,XgtE,
+birthplace,d100,85,You were born in a sewer or rubbish heap.,,,XgtE,
+birthplace,d100,86-88,You were born among people of a different race.,,,XgtE,
+birthplace,d100,89-91,You were born on a boat or ship.,,,XgtE,
+birthplace,d100,92-93,You were born in a prison or in the headquarters of a secret organization.,,,XgtE,
+birthplace,d100,94-95,You were born in a sage's laboratory.,,,XgtE,
+birthplace,d100,96,You were born in the feywild.,,,XgtE,
+birthplace,d100,97,You were born in the shadowfell.,,,XgtE,
+birthplace,d100,98,You were born on the astral plane or the etheral plane.,,,XgtE,
+birthplace,d100,99,You were born on an inner plane of your choice.,,,XgtE,
+birthplace,d100,100,You were born on an outer plane of your choice.,,,XgtE,
+siblings,d10,1-2,You have no siblings.,0,,XgtE,
+siblings,d10,3-4,You have a few siblings.,1d3,,XgtE,
+siblings,d10,5-6,You have a number of siblings.,1d4+1,,XgtE,
+siblings,d10,7-8,You have a large family of siblings.,1d6+2,,XgtE,
+siblings,d10,9-10,You have a great many siblings.,1d8+3,,XgtE,
+birthorder,2d6,2,twin,,twin,XgtE,
+birthorder,2d6,3-7,older,,older,XgtE,
+birthorder,2d6,8-12,younger,,younger,XgtE,
+family,d100,1,You grew up on your own.,,orphan,XgtE,
+family,d100,2,"You were raised in an institution, such as an asylum.",,institution,XgtE,
+family,d100,3,You were raised in a temple.,,institution,XgtE,
+family,d100,4-5,You were raised in an orphanage.,,orphan,XgtE,
+family,d100,6-7,You were raised by a guardian.,,mentor,XgtE,
+family,d100,8-15,You were raised by a relative or extended family such as tribe or clan.,,relative,XgtE,
+family,d100,16-25,You were raised by your paternal or maternal grandparents.,,grandparent,XgtE,
+family,d100,26-35,You were raised by an adoptive family (same or different race).,,adoption,XgtE,
+family,d100,36-55,You were raised by your father alone.,,father,XgtE,
+family,d100,56-75,You were raised by your mother alone.,,mother,XgtE,
+family,d100,76-100,You were raised by both of your parents.,,both,XgtE,
+absent,d4,1,died when you were young.,Dead,dead,XgtE,
+absent,d4,2,"was imprisoned, enslaved or otherwise taken away.",Imprisoned,away,XgtE,
+absent,d4,3,abandoned you.,Left the family,gone,XgtE,
+absent,d4,4,disappeared to an unknown fate..,Missing,missing,XgtE,
+lifestyle,3d6,3,Your family lived in wretched poverty.,0,wretched,XgtE,
+lifestyle,3d6,4-5,Your family lived in squalid conditions.,20,squalid,XgtE,
+lifestyle,3d6,6-8,Your family was poor but got by.,30,poor,XgtE,
+lifestyle,3d6,9-12,Your family lived a modest life.,40,modest,XgtE,
+lifestyle,3d6,13-15,Your family was comfortable.,50,comfortable,XgtE,
+lifestyle,3d6,16-17,Your family was wealthy.,60,wealthy,XgtE,
+lifestyle,3d6,18,Your family was rich and powerful.,80,aristocratic,XgtE,
+childhome,d100,1-40,You grew up on the streets.,,,XgtE,
+childhome,d100,41-60,You grew up in a rundown shack.,,,XgtE,
+childhome,d100,61-70,You had no permanent residence and moved around a lot.,,,XgtE,
+childhome,d100,71-80,You grew up in an encampment or village in the wilderness.,,,XgtE,
+childhome,d100,81-90,You grew up in an apartment in a rundown neighborhood.,,,XgtE,
+childhome,d100,91-110,You grew up in a small house.,,,XgtE,
+childhome,d100,111-130,You grew up in a large house.,,,XgtE,
+childhome,d100,131-150,You grew up in a mansion.,,,XgtE,
+childhome,d100,151-180,You grew up in a palace or castle.,,,XgtE,
+childmemories,3d6,3,"You ware still haunted by your childhood, when you were treated badly by your peers.",,,XgtE,
+childmemories,3d6,4-5,"You spent most of your childhood alone, with no close friends.",,,XgtE,
+childmemories,3d6,6-8,"Others saw you as being different or strange, and so you had few companions.",,,XgtE,
+childmemories,3d6,9-12,You had a few close friends and lived an ordinary childhood.,,,XgtE,
+childmemories,3d6,13-15,"You had several friends, and your childhood was a generally happy one.",,,XgtE,
+childmemories,3d6,16-17,"You always found it easy to make friends, and you loved being around people.",,,XgtE,
+childmemories,3d6,18-23,"Everyone knew who you were, and you had friends everywhere you went.",,,XgtE,
+agebracket,d100,1-20,Youth,1,11-20,XgtE,
+agebracket,d100,21-59,Young adult,1d4,21-30,XgtE,
+agebracket,d100,60-69,Adult,1d6,31-40,XgtE,
+agebracket,d100,70-89,Mature,1d8,41-50,XgtE,
+agebracket,d100,90-99,Middle-aged,1d10,51-60,XgtE,
+agebracket,d100,100,Elder,1d12,61-80,XgtE,
+occupation,d100,1-5,Academic,,,XgtE,
+occupation,d100,6-10,Adventurer,,adventurer,XgtE,
+occupation,d100,11,Aristocrat,,,XgtE,
+occupation,d100,12-26,Artisan or Guild Member,,,XgtE,
+occupation,d100,27-31,Criminal,,,XgtE,
+occupation,d100,32-36,Entertainer,,,XgtE,
+occupation,d100,37-38,"Exile, Hermit or Refugee",,,XgtE,
+occupation,d100,39-43,Explorer or Wanderer,,,XgtE,
+occupation,d100,44-55,Farmer or Herder,,,XgtE,
+occupation,d100,56-60,Hunter or Trapper,,,XgtE,
+occupation,d100,61-75,Laborer,,,XgtE,
+occupation,d100,76-80,Merchant,,,XgtE,
+occupation,d100,81-85,Politician or Bureaucrat,,,XgtE,
+occupation,d100,86-90,Priest,,,XgtE,
+occupation,d100,91-95,Sailor,,,XgtE,
+occupation,d100,96-100,Soldier,,,XgtE,
+alignment,3d6,3,Chaotic Evil or Chaotic Neutral,,,XgtE,
+alignment,3d6,4-5,Lawful Evil,,,XgtE,
+alignment,3d6,6-8,Neutral Evil,,,XgtE,
+alignment,3d6,9-12,Neutral,,,XgtE,
+alignment,3d6,13-15,Neutral Good,,,XgtE,
+alignment,3d6,16,Lawful Good,,,XgtE,
+alignment,3d6,17,Lawful Neutral,,,XgtE,
+alignment,3d6,18,Chaotic Good or Chaotic Neutral,,,XgtE,
+attitude,3d4,3-4,Hostile,,,XgtE,
+attitude,3d4,5-10,Friendly,,,XgtE,
+attitude,3d4,11-12,Indifferent,,,XgtE,
+status,3d6,3,Dead,,dead,XgtE,
+status,3d6,4-5,Missing,,missing,XgtE,
+status,3d6,6-8,"Struggling (poor, ill or in trouble)",,,XgtE,
+status,3d6,9-12,Alive and Well,,,XgtE,
+status,3d6,13-15,Successful,,,XgtE,
+status,3d6,16-17,Infamous,,,XgtE,
+status,3d6,18,Famous,,,XgtE,
+deathcause,d12,1,Unknown,,,XgtE,
+deathcause,d12,2,Murdered,,,XgtE,
+deathcause,d12,3,Killed in Battle,,,XgtE,
+deathcause,d12,4,Accident (work-related),,,XgtE,
+deathcause,d12,5,Accident,,,XgtE,
+deathcause,d12,6-7,Natural Causes,,,XgtE,
+deathcause,d12,8,Apparent Suicide,,,XgtE,
+deathcause,d12,9,Natural Disaster or Wild Animals,,,XgtE,
+deathcause,d12,10,Consumed by a Monster,,,XgtE,
+deathcause,d12,11,Executed or Tortured,,,XgtE,
+deathcause,d12,12,Bizarre Event,,,XgtE,
