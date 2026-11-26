@@ -82,10 +82,12 @@ function nameOnce(c,s,sex,share){
 function npc(c,rel,o,lg){
  const s=o.spn||c.spn,sex=o.sex||sexFor(),p={rel,spn:s,sex,lin:o.lin!==undefined?o.lin:(s==c.spn?c.lin:linFor(s))};
  p.id=nid();p.h=o.h!=null?o.h:ageRoll(lg,rel).h;p.age=toSp(p.h,s);p.lab=lab(p.h);
+ const NPCSP=!!(D.npcsp&&D.npcsp.includes(s));
  const tp=(D.turn&&D.turn[s])||0;
  if(tp>0&&!o.share&&o.turnable!==false){const t=rnd(100)<=tp;lg.push(rel+" turned into "+s+"? ("+tp+"% chance): "+(t?"yes":"no"));if(t)p.init=pickInit(s)}
  p.name=nameFor(c,p.init?p.init.spn:s,sex,o.share);USED.add(p.name);
- if(p.h<11&&!o.occ&&!o.adv)p.occ="Child";
+ if(NPCSP){p.occ="";p.align=bt("alignment",lg,0,rel+" alignment").txt}
+ else if(p.h<11&&!o.occ&&!o.adv)p.occ="Child";
  else{
   let adv=null;
   if(NOADV)adv=false;else if(o.adv===true)adv=true;else if(typeof o.adv=="number"){adv=Math.random()<o.adv;lg.push(rel+" adventurer chance "+Math.round(o.adv*100)+"%: "+(adv?"yes":"no"))}
@@ -101,7 +103,7 @@ function npc(c,rel,o,lg){
  if(st=="Dead"){let dc=bt("deathcause",lg,0,rel+" cause of death"),z=0;while(IMM(s)&&/old age/i.test(dc.txt)&&z++<30)dc=bt("deathcause",lg,0,rel+" cause of death (re-roll)");st="Dead ("+dc.txt+")"}
  p.status=st;return p;
 }
-const pl=p=>p.name+" - "+p.rel+". "+p.spn+(p.lin?" ("+p.lin+")":"")+(p.init?" [born "+p.init.spn+"]":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+p.occ+(p.cls?" ("+p.cls+")":"")+"."+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".";
+const pl=p=>p.name+" - "+p.rel+". "+p.spn+(p.lin?" ("+p.lin+")":"")+(p.init?" [born "+p.init.spn+"]":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+(p.occ?p.occ+(p.cls?" ("+p.cls+")":"")+".":"")+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".";
 
 // ---- Life events (v1.2.1). Tables come from data/events.csv; partner rules use hybrids.csv. ----
 const CHAIN={war:"warout",crime:"punishment"};
@@ -127,7 +129,7 @@ function events(c,n,lg,ppl,imp,K,lone,TR){
    if(x.note)ei.push("Age "+age+" ("+et.txt+"): "+x.note);
   }
   const mk=(rel,o)=>{const p=npc(c,rel,o,lg);ppl.push(p);names.push(p.name+", "+rel.toLowerCase());return p};
-  const spx=kind=>{const o=outSp(c,kind);lg.push(kind+" species: "+(o.spn==c.spn?"same":"different ("+o.spn+")")+" ("+(D.odds&&D.odds[kind]!=null?D.odds[kind]:100)+"% same)");return o};
+  const spx=kind=>{const o=outSp(c,kind);lg.push(kind+" species: "+(o.spn==c.spn?"same":"different ("+o.spn+")")+" ("+oddsOf(kind)+"% same)");return o};
   const r=e.rs[0],tg=r&&r.tag?r.tag.split(",").map(x=>x.trim()):[],t=tg[0],coin=(why)=>{const v=rnd(2)==1;lg.push(why+": "+(v?"yes":"no")+" (coin flip)");return v};
   const acq=(rel,sp)=>mk(rel,Object.assign({adv:0.5},sp?{spn:sp,lin:linFor(sp)}:spx("Important contact")));
   if(tg.includes("Sire"))acq("Sire","Dhampir");if(tg.includes("Hag"))acq("Hag","Hexblood");if(tg.includes("Alpha"))acq("Alpha","Lupin");if(tg.includes("Necromancer"))acq("Necromancer");
@@ -180,8 +182,9 @@ function sibLine(c,L){
 function pickInit(cur){const t=D.species.filter(x=>x[0]!=cur&&!(D.turn&&D.turn[x[0]]>0));const sp=pick(t.length?t:D.species,rnd(100))[0];return{spn:sp,lin:linFor(sp)}}
 // What species can a child of this couple be? Rows in offspring.csv; otherwise the couple's own species (same species) or none.
 function childSp(a,b){const r=(D.off||[]).filter(x=>(x[0]==a&&x[1]==b)||(x[0]==b&&x[1]==a));if(r.length)return pick(r.map(x=>[x[2],x[3]]),rnd(100))[0];return a==b?a:null}
+const oddsOf=k=>D.odds&&D.odds[k]!=null?D.odds[k]:({Friend:60,Enemy:50,"Important contact":40,Mentor:50}[k]??100);
 function outSp(c,kind){
- const pct=D.odds&&D.odds[kind]!=null?D.odds[kind]:100;let s=c.spn;
+ const pct=oddsOf(kind);let s=c.spn;
  if(rnd(100)>pct){const t=D.species.filter(x=>x[0]!=c.spn);if(t.length)s=pick(t,rnd(100))[0]}
  return{spn:s,lin:linFor(s)};
 }
@@ -255,7 +258,7 @@ function backstory0(c,inh,K,lone){
  return{bio:B.join("\n\n"),people:ppl,imp,events:ne.t,fam:F};
 }
 
-const plh=p=>'<b'+(p.cls?' class="adv"':"")+'>'+esc(p.name+" - "+p.rel+".")+'</b> '+esc(p.spn+(p.lin?" ("+p.lin+")":"")+(p.init?" [born "+p.init.spn+"]":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+p.occ)+(p.cls?' <span class="adv">('+esc(p.cls)+')</span>':"")+esc("."+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".");
+const plh=p=>'<b'+(p.cls?' class="adv"':"")+'>'+esc(p.name+" - "+p.rel+".")+'</b> '+esc(p.spn+(p.lin?" ("+p.lin+")":"")+(p.init?" [born "+p.init.spn+"]":"")+", "+p.sex+", age "+p.age+" ("+p.lab+"). "+(p.occ||""))+(p.cls?' <span class="adv">('+esc(p.cls)+')</span>':"")+esc((p.occ?".":"")+(p.align?" "+p.align+".":"")+" "+p.att+". "+p.status+".");
 const bsText=c=>c.bs?"\n\nBIOGRAPHY\n"+c.bs.bio+"\n\nPEOPLE YOU KNOW\n"+c.bs.people.map(pl).join("\n")+"\n\nEFFECTS ON YOUR CHARACTER SHEET\n"+(c.bs.imp.length?c.bs.imp.join("\n"):"(none yet)"):"";
 const esc=s=>String(s).replace(/[&<>"]/g,m=>"&#"+m.charCodeAt(0)+";");
 function renderBS(c){renderBS0(c);renderEnt()}
@@ -391,7 +394,8 @@ function tables(){
  +'<h2>3. Sex</h2>'+T(["d100","Sex"],D.sex.map((s,i)=>[rx[i],s[0]]))
  +'<h2>4. Class (column = your species)</h2><div class="sc">'+T(["Class"].concat(sp.map(s=>s[0].slice(0,4))).concat(["Src"]),D.cls.map((c,i)=>[c.n].concat(g.map(x=>x[i])).concat([c.s])))+'</div>'
  +'<h2>5. Origin</h2>'+T(["d100","Origin","Source"],D.bg.map((b,i)=>[rb[i],b[0],b[2]]))
- +Object.keys(D.bt).map(k=>'<h2 class="pb">Backstory: '+k+' ('+D.bd[k]+')</h2>'+T(["Roll","Result"],D.bt[k].map(r=>[r.r,r.txt]))).join("");
+ +Object.keys(D.bt).map(k=>'<h2 class="pb">Backstory: '+k+' ('+D.bd[k]+')</h2>'+T(["Roll","Result"],D.bt[k].map(r=>[r.r,r.txt]))).join("")
+ +'<h2 class="pb">Data used by this build</h2><pre style="white-space:pre-wrap;font-size:12px">'+esc((D.report||[]).join("\n"))+'</pre>';
 }
 function names(){
  let h='<button onclick="window.print()">Print / save as PDF</button><p class="sub">'+APP+'. Name lists: roll a d100 for each column (00 = 100).</p>';
