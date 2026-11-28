@@ -64,7 +64,7 @@ atexit.register(_pause)
 atexit.register(_writelog)   # runs first: the log is saved before the "Press Enter" prompt
 
 APP = "Randomizer5e2024"
-VERSION = "1.3.3"
+VERSION = "1.4"
 IMMORTAL_SCALE = 1000   # years used to scale ages of species whose lifespan is "immortal" (display only; they never die of old age)
 
 here = pathlib.Path(__file__).resolve().parent
@@ -119,6 +119,7 @@ for _fn, _cols in (("parentage.csv", ("species", "parent_a", "parent_b")), ("off
             for _c in _cols:
                 _refs.add((r.get(_c) or "").strip())
 _refs.discard("")
+_refs.discard("Any")
 for _x in sorted(_refs - {r["species"].strip() for r in _all_species}):
     npc_only.add(_x)
     print("Note: '%s' appears in parentage/offspring but not in species.csv, so it is an NPC-only species (never playable, no occupation, cannot die of old age; its names go in names_npc.csv)" % _x)
@@ -253,11 +254,12 @@ par, off = {}, []
 known_sp = set(sp_names) | npc_only
 if (data / "parentage.csv").exists():
     for r in rows("parentage.csv"):
-        names3 = [r["species"].strip(), r["parent_a"].strip(), r["parent_b"].strip()]
+        names3 = [r["species"].strip(), r["parent_a"].strip(), (r.get("parent_b") or "").strip()]
         for n_ in names3:
-            if n_ not in known_sp:
+            if n_ and n_ != "Any" and n_ not in known_sp:
                 print("Warning: parentage.csv mentions unknown species '%s'" % n_)
-        par.setdefault(names3[0], []).append([names3[1], names3[2], num(r["weight"])])
+        # an empty parent_b means a single maker (like Warforged); parent_a "Any" = any playable species
+        par.setdefault(names3[0], []).append([names3[1], names3[2], num(r["weight"]), (r.get("relation") or ("Maker" if not names3[2] else "")).strip()])
 if (data / "offspring.csv").exists():
     for r in rows("offspring.csv"):
         trio = [r["parent_a"].strip(), r["parent_b"].strip(), r["child"].strip()]
@@ -266,8 +268,8 @@ if (data / "offspring.csv").exists():
                 print("Warning: offspring.csv mentions unknown species '%s'" % n_)
         off.append(trio + [num(r["weight"])])
 for sp_, lst in par.items():
-    for a_, b_, w_ in lst:
-        if a_ != b_ and not any(((o[0] == a_ and o[1] == b_) or (o[0] == b_ and o[1] == a_)) and o[2] == sp_ for o in off):
+    for a_, b_, w_, *_rest in lst:
+        if b_ and a_ != b_ and not any(((o[0] == a_ and o[1] == b_) or (o[0] == b_ and o[1] == a_)) and o[2] == sp_ for o in off):
             print("Warning: %s parents %s + %s: offspring.csv has no row letting that couple have a %s child" % (sp_, a_, b_, sp_))
 if (data / "hybrids.csv").exists():
     print("Note: hybrids.csv is no longer used; put couples and their children in offspring.csv")
@@ -307,8 +309,15 @@ for _s in sp_names + sorted(npc_only):
     _n = names[_s]
     rep("  names %-12s F/M/S: %d/%d/%d" % (_s, len(_n["F"]), len(_n["M"]), len(_n["S"])))
 
+if "Warforged" in sp_names and "Warforged" not in par:
+    par["Warforged"] = [["Any", "", 100, "Maker"]]
+    print("Note: Warforged had no parentage row; it was given a single 'Maker' of any species (add a row to parentage.csv to change this)")
+made = sorted(s_ for s_, l_ in par.items() if all(not x[1] for x in l_))
+if made:
+    print("Made species (one maker, no parents, no siblings, cannot have children): %s" % ", ".join(made))
+
 payload = {"app": APP, "version": VERSION, "sources": sources, "species": species, "lin": lin,
-           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds, "turn": turn, "par": par, "off": off, "npcsp": sorted(npc_only), "report": REPORT}
+           "cls": cls, "bg": bg, "sex": sex, "names": names, "bt": bt, "bd": bd, "age": ages, "hyb": hyb, "odds": odds, "turn": turn, "par": par, "off": off, "npcsp": sorted(npc_only), "made": made, "report": REPORT}
 blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 template = (here / "template.html").read_text(encoding="utf-8")

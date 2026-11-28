@@ -62,7 +62,13 @@ function bt(name,lg,mod,label){
 // Ages are handled in "human-equivalent years" (h) and converted to the species' own years for display.
 const HL=()=>D.age.Human[1],IMM=s=>!!(D.age[s]&&D.age[s][2]);
 const bsp=c=>c.init?c.init.spn:c.spn,bln=c=>c.init?c.init.lin:c.lin,an=s=>/^[AEIOUaeiou]/.test(s)?"an":"a";
-const toSp=(h,sp)=>{const a=D.age[sp]||[18,80];return Math.max(1,Math.round(h<18?h/18*a[0]:a[0]+(h-18)/(HL()-18)*(a[1]-a[0])))};
+const ageOf=s=>D.age[s]||[18,80,0];
+const toYr=(h,s)=>{const a=ageOf(s);return h<18?h/18*a[0]:a[0]+(h-18)/(HL()-18)*(a[1]-a[0])};   // years lived when a creature of species s reaches human-equivalent stage h
+const toStage=(R,s)=>{const a=ageOf(s);return R<a[0]?R/a[0]*18:18+(R-a[0])/(a[1]-a[0])*(HL()-18)};
+const yps=s=>{const a=ageOf(s);return(a[1]-a[0])/(HL()-18)};   // years per human adult year
+const toSp=(h,sp)=>Math.max(1,Math.round(toYr(h,sp)));
+const yrs=(c,h)=>c.init&&c.ht!=null?(h<=c.ht?toYr(h,c.init.spn):toYr(c.ht,c.init.spn)+(h-c.ht)*yps(c.spn)):toYr(h,c.spn);
+const Rof=p=>p.R!=null?p.R:toYr(p.h,p.spn);
 const lab=h=>{if(h<11)return"Child";let b=D.bt.agebracket[0];for(const r of D.bt.agebracket)if(h>=+r.tag.split("-")[0])b=r;return b.txt};
 function ageRoll(lg,who){const b=bt("agebracket",lg,0,who+" age bracket"),d=rnd(10),h=+b.tag.split("-")[0]+d-1;lg.push(who+" exact age: 1d10 = "+d+"  -> "+h+" (human-equivalent years)");return{b,h}}
 const clsTab=s=>{const t=D.cls.map(c=>[c.n,c.w[s]||0,c.s]);if(!t.some(x=>x[1]>0))t.forEach(x=>x[1]=1);return t};
@@ -81,10 +87,13 @@ function nameOnce(c,s,sex,share){
 // One routine builds every secondary character.
 function npc(c,rel,o,lg){
  const s=o.spn||c.spn,sex=o.sex||sexFor(),p={rel,spn:s,sex,lin:o.lin!==undefined?o.lin:(s==c.spn?c.lin:linFor(s))};
- p.id=nid();p.h=o.h!=null?o.h:ageRoll(lg,rel).h;p.age=toSp(p.h,s);p.lab=lab(p.h);
+ p.id=nid();const h0=o.R!=null?null:(o.h!=null?o.h:ageRoll(lg,rel).h);
  const NPCSP=!!(D.npcsp&&D.npcsp.includes(s));
  const tp=(D.turn&&D.turn[s])||0;
  if(tp>0&&!o.share&&o.turnable!==false){const t=rnd(100)<=tp;lg.push(rel+" turned into "+s+"? ("+tp+"% chance): "+(t?"yes":"no"));if(t)p.init=pickInit(s)}
+ if(o.R!=null){p.R=o.R;p.h=toStage(p.R,s)}
+ else{p.h=h0;if(p.init){const lo=Math.min(p.h,16);p.ht=lo+Math.floor(Math.random()*(p.h-lo+1));p.R=yrs({init:p.init,ht:p.ht,spn:s},p.h)}else p.R=toYr(p.h,s)}
+ p.age=Math.max(1,Math.round(p.R));p.lab=lab(p.h);
  p.name=nameFor(c,p.init?p.init.spn:s,sex,o.share);USED.add(p.name);
  if(NPCSP){p.occ="";p.align=bt("alignment",lg,0,rel+" alignment").txt}
  else if(p.h<11&&!o.occ&&!o.adv)p.occ="Child";
@@ -118,12 +127,12 @@ function events(c,n,lg,ppl,imp,K,lone,TR){
    if(k!="love"){rs.push(bt(k,lg,0,et.txt+" result"));if(CHAIN[k])rs.push(bt(CHAIN[k],lg,0,CHAIN[k]))}z++}while(false);
   ev.push({et,k,eh,rs});
  }
- if(TR){const lo2=Math.min(c.h,16);ev.push({et:{txt:"Transformation"},k:"turn",eh:lo2+Math.floor(Math.random()*(c.h-lo2+1)),rs:[TR]})}
+ if(TR){ev.push({et:{txt:"Transformation"},k:"turn",eh:c.ht!=null?c.ht:Math.min(c.h,16),rs:[TR]})}
  ev.sort((a,b)=>a.eh-b.eh);
  const out=[],parts=[];let loves=0;
  if(K&&K.partners&&K.partners.length){K.partners.forEach(p=>parts.push({p,same:false,diff:false}));loves=1}
  for(const e of ev){
-  const et=e.et,age=toSp(e.eh,c.spn),ei=[],names=[];let text=e.rs.map(x=>x.txt).join(" ");
+  const et=e.et,age=Math.max(1,Math.round(yrs(c,e.eh))),ei=[],names=[];let text=e.rs.map(x=>x.txt).join(" ");
   for(const x of e.rs){
    if(x.val&&x.tag!="important"){const g=dice(x.val);lg.push("Gold: "+x.val+" = "+g.p.join("+")+" = "+g.t);ei.push("Age "+age+" ("+et.txt+"): gained "+g.t+" gp.")}
    if(x.note)ei.push("Age "+age+" ("+et.txt+"): "+x.note);
@@ -156,7 +165,7 @@ function events(c,n,lg,ppl,imp,K,lone,TR){
     const child=wed&&cur().length>0&&!(K&&K.kids&&K.kids.length)&&coin("Later love event: a child with a current partner rather than a new lover");
     if(child){
      const x=cur()[rnd(cur().length)-1],cs=x.same?null:childSp(c.spn,x.p.spn);
-     if(cs){const kd=mk("Child",{spn:cs,sex:sexFor(),h:Math.max(1,c.h-e.eh),lin:cs==c.spn?c.lin:linFor(cs),share:true});kd.other=x.p.id;text="You had a child with "+x.p.name+"."}
+     if(cs){const kd=mk("Child",{spn:cs,sex:sexFor(),R:Math.max(0.2,c.R-yrs(c,e.eh)),lin:cs==c.spn?c.lin:linFor(cs),share:true});kd.other=x.p.id;text="You had a child with "+x.p.name+"."}
      else{lg.push("No child possible for this couple");text="You and "+x.p.name+" hoped for a child, but this couple could not have one."}
     }else if(cur().length&&coin("New lover kept secret from the current partner")){
      partner("Secret lover");text="You began a secret affair.";
@@ -176,12 +185,12 @@ function events(c,n,lg,ppl,imp,K,lone,TR){
 const ordn=n=>{const s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])};
 function sibLine(c,L){
  if(!L.length)return"You are an only child.";
- const older=L.filter(p=>p.h>c.h).length,tw=L.filter(p=>p.h==c.h).length;
+ const older=L.filter(p=>Rof(p)>Rof(c)+0.01).length,tw=L.filter(p=>Math.abs(Rof(p)-Rof(c))<=0.01).length;
  return"You are the "+ordn(older+1)+" of "+(L.length+1)+" children"+(tw==1?", and you have a twin":tw>1?", and you are one of a set of "+(tw==2?"triplets":"multiples"):"")+".";
 }
 function pickInit(cur){const t=D.species.filter(x=>x[0]!=cur&&!(D.turn&&D.turn[x[0]]>0));const sp=pick(t.length?t:D.species,rnd(100))[0];return{spn:sp,lin:linFor(sp)}}
 // What species can a child of this couple be? Rows in offspring.csv; otherwise the couple's own species (same species) or none.
-function childSp(a,b){const r=(D.off||[]).filter(x=>(x[0]==a&&x[1]==b)||(x[0]==b&&x[1]==a));if(r.length)return pick(r.map(x=>[x[2],x[3]]),rnd(100))[0];return a==b?a:null}
+function childSp(a,b){const r=(D.off||[]).filter(x=>(x[0]==a&&x[1]==b)||(x[0]==b&&x[1]==a));if(r.length)return pick(r.map(x=>[x[2],x[3]]),rnd(100))[0];if(D.made&&(D.made.includes(a)||D.made.includes(b)))return null;return a==b?a:null}
 const oddsOf=k=>D.odds&&D.odds[k]!=null?D.odds[k]:({Friend:60,Enemy:50,"Important contact":40,Mentor:50}[k]??100);
 function outSp(c,kind){
  const pct=oddsOf(kind);let s=c.spn;
@@ -198,6 +207,8 @@ function backstory0(c,inh,K,lone){
  if(c.keep){a={b:brk(c.h),h:c.h};lg.push("Age kept from the sketch: "+c.age+" years ("+a.b.txt+")")}
  else{a=ageRoll(lg,"Character");c.age=toSp(a.h,c.spn)}
  c.h=a.h;c.bracket=a.b.txt;
+ if(c.init&&c.ht==null){const lo=Math.min(c.h,16);c.ht=lo+Math.floor(Math.random()*(c.h-lo+1))}
+ if(!c.keep||c.R==null){c.R=yrs(c,c.h);c.age=Math.max(1,Math.round(c.R))}
  const ne=dice(a.b.val);lg.push("Number of life events: "+a.b.val+" = "+ne.p.join("+")+" = "+ne.t);
  if(!c.align)c.align=bt("alignment",lg,0,"alignment").txt;
  let TR=null;
@@ -208,7 +219,14 @@ function backstory0(c,inh,K,lone){
   F=inh.f;ppl.push(...inh.people);
   sibTxt=sibLine(c,inh.sibs);
   lg.push("Family facts inherited from "+inh.from+".");
- }else if(amn){F=null;sibTxt="";lg.push("Amnesia: birth, parents, upbringing and siblings are not generated.")}else{
+ }else if(amn){F=null;sibTxt="";lg.push("Amnesia: birth, parents, upbringing and siblings are not generated.")}
+ else if((D.made||[]).includes(bsp(c))){
+  const mrow=D.par[bsp(c)],me=pick(mrow.map(x=>[x[0],x[2],x[0],x[3]]),rnd(100));
+  const ms=me[2]=="Any"?pick(D.species.filter(x=>!(D.made||[]).includes(x[0])),rnd(100))[0]:me[2];
+  lg.push("Made, not born: maker's species: "+ms);
+  const mk0=npc(c,me[3]||"Maker",{spn:ms,lin:linFor(ms),sex:sexFor(),R:c.R+toYr(18+rnd(12),ms)},lg);ppl.push(mk0);
+  F={made:"You were built, not born. Your "+(me[3]||"Maker").toLowerCase()+" was "+mk0.name+", "+an(ms)+" "+ms.toLowerCase()+"."};sibTxt="You have no siblings."
+ }else{
   const KP=!!(K&&K.parents.length),KS=KP||!!(K&&K.sibs.length);
   const bp=bt("birthplace",lg);let pr=KP?{txt:"You know who your parents were.",tag:"known"}:bt("parents",lg);
   const known=pr.tag=="known";
@@ -225,27 +243,28 @@ function backstory0(c,inh,K,lone){
   if(KP)ppl.push(...K.parents.map(p=>Object.assign({},p)));
   if(known&&!KP){
    const sp=PP;
-   [["Mother","F",sp[0]],["Father","M",sp[1]]].forEach(([rel,sex,s])=>ppl.push(npc(c,rel,{spn:s,sex,h:c.h+17+rnd(14),share:true,lin:s==bsp(c)?bln(c):linFor(s),status:abw==rel?ab.val:null},lg)));
+   [["Mother","F",sp[0]],["Father","M",sp[1]]].forEach(([rel,sex,s])=>ppl.push(npc(c,rel,{spn:s,sex,R:c.R+toYr(18+rnd(12),s),share:true,lin:s==bsp(c)?bln(c):linFor(s),status:abw==rel?ab.val:null},lg)));
   }
   const kin=fm.tag;
-  if(kin=="grandparent"){const ks=PP[rnd(2)-1];ppl.push(npc(c,"Grandparent",{spn:ks,lin:ks==bsp(c)?bln(c):linFor(ks),sex:sexFor(),h:c.h+42+rnd(18),share:true},lg))}
-  if(kin=="relative"){const sx=sexFor(),ks=PP[rnd(2)-1];ppl.push(npc(c,sx=="M"?"Uncle":sx=="F"?"Aunt":"Aunt or uncle",{spn:ks,lin:ks==bsp(c)?bln(c):linFor(ks),sex:sx,h:c.h+8+rnd(16),share:true},lg))}
+  if(kin=="grandparent"){const ks=PP[rnd(2)-1];ppl.push(npc(c,"Grandparent",{spn:ks,lin:ks==bsp(c)?bln(c):linFor(ks),sex:sexFor(),R:c.R+2*toYr(18+rnd(12),ks),share:true},lg))}
+  if(kin=="relative"){const sx=sexFor(),ks=PP[rnd(2)-1];ppl.push(npc(c,sx=="M"?"Uncle":sx=="F"?"Aunt":"Aunt or uncle",{spn:ks,lin:ks==bsp(c)?bln(c):linFor(ks),sex:sx,R:Math.max(c.R+toYr(16,ks),c.R+toYr(18+rnd(12),ks)+(rnd(11)-6)*yps(ks)),share:true},lg))}
   if(kin=="mentor"){const mo=outSp(c,"Mentor");lg.push("Mentor species: "+(mo.spn==c.spn?"same":"different ("+mo.spn+")"));ppl.push(npc(c,"Mentor",{spn:mo.spn,lin:mo.lin,att:"Friendly"},lg))}
   let sb=KS?{txt:"",val:"0"}:bt("siblings",lg),sn=KS?{p:[0],t:0}:dice(sb.val);const sl=[];
   if(!KS)lg.push("Number of siblings: "+sb.val+" = "+sn.p.join("+")+" = "+sn.t);
   if(KS){K.sibs.forEach(p=>{ppl.push(Object.assign({},p));sl.push(p)});lg.push("Siblings already exist in the entourage: "+(sl.length||"none")+" (not generated again).")}
   for(let i=1;i<=sn.t;i++){
    const bo=bt("birthorder",lg,0,"sibling "+i+" birth order"),sx=sexFor(),ss=childSp(PP[0],PP[1])||bsp(c);
-   const h=bo.tag=="twin"?c.h:bo.tag=="older"?c.h+rnd(6):Math.max(1,c.h-rnd(6));
+   const gy=rnd(6)*yps(PP[0]),R=bo.tag=="twin"?c.R:bo.tag=="older"?c.R+gy:Math.max(0.2,c.R-gy);
    const w=sx=="M"?"brother":sx=="F"?"sister":"sibling";
-   const p=npc(c,(bo.tag=="twin"?"Twin ":bo.tag=="older"?"Older ":"Younger ")+w,{sex:sx,h,share:true,spn:ss,lin:ss==bsp(c)?bln(c):linFor(ss)},lg);ppl.push(p);sl.push(p);
+   const p=npc(c,(bo.tag=="twin"?"Twin ":bo.tag=="older"?"Older ":"Younger ")+w,{sex:sx,R,share:true,spn:ss,lin:ss==bsp(c)?bln(c):linFor(ss)},lg);ppl.push(p);sl.push(p);
   }
   const ls=bt("lifestyle",lg),ch=bt("childhome",lg,+ls.val||0,"childhood home");
   F={bp,pr,ptxt,fm,ab,abw,ls,ch};sibTxt=sibLine(c,sl);
  }
  B.push("Age: "+c.age+" ("+c.bracket+").");
- if(c.init)B.push("Species: You were born "+an(c.init.spn)+" "+c.init.spn+(c.init.lin?" ("+c.init.lin+")":"")+" and were later turned into "+an(c.spn)+" "+c.spn+".");
+ if(c.init)B.push("Species: You were born "+an(c.init.spn)+" "+c.init.spn+(c.init.lin?" ("+c.init.lin+")":"")+" and were turned into "+an(c.spn)+" "+c.spn+" around age "+Math.round(yrs(c,c.ht))+".");
  if(amn)B.push("Childhood: You do not remember who you were as a child, or where you came from.");
+ else if(F&&F.made)B.push("Origin: "+F.made);
  else{
   B.push("Birth and parents: "+F.bp.txt+" "+F.pr.txt+F.ptxt);
   B.push("Siblings: "+sibTxt);
@@ -414,7 +433,7 @@ const nid=()=>"p"+(MAIN.seq=(MAIN.seq||0)+1);
 const allChars=()=>Object.assign({pc:MAIN},MAIN.ent.chars);
 function ensureIds(c){Object.values(allChars()).forEach(x=>((x.bs&&x.bs.people)||[]).forEach(p=>{if(!p.id)p.id=nid()}))}
 const sibRx=/(brother|sister|sibling)$/i;
-const selfNpc=(X,id)=>({id:id||X.id||"pc",name:X.name,spn:X.spn,lin:X.lin,init:X.init,sex:X.sex,h:X.h,age:X.age,lab:X.bracket,occ:"Adventurer",cls:X.cls,align:X.align,att:"Friendly",status:"Alive and getting by"});
+const selfNpc=(X,id)=>({id:id||X.id||"pc",name:X.name,spn:X.spn,lin:X.lin,init:X.init,sex:X.sex,h:X.h,R:X.R,age:X.age,lab:X.bracket,occ:"Adventurer",cls:X.cls,align:X.align,att:"Friendly",status:"Alive and getting by"});
 const sibWord=s=>s=="M"?"brother":s=="F"?"sister":"sibling";
 function INV(r,X){
  const s=X.sex;
@@ -427,28 +446,28 @@ function INV(r,X){
  if(/^(Aunt|Uncle)/.test(r))return s=="F"?"Niece":s=="M"?"Nephew":"Niece or nephew";
  if(r=="Mentor")return"Student";
  if(r=="Important contact")return"Acquaintance";
- if(r=="Sire")return"Progeny";if(r=="Hag")return"Prot\u00e9g\u00e9";if(r=="Alpha")return"Packmate";if(r=="Necromancer")return"Creation";
+ if(r=="Sire")return"Progeny";if(r=="Hag")return"Prot\u00e9g\u00e9";if(r=="Alpha")return"Packmate";if(r=="Necromancer"||r=="Maker")return"Creation";
  return r;
 }
 // Siblings share the family facts of the character who created them.
 function inherit(X,rec){
  const P=X.bs.people,xid=X.id||"pc";
  const keep=P.filter(p=>p.rel=="Mother"||p.rel=="Father"||p.rel=="Grandparent"||/^(Aunt|Uncle|Aunt or uncle)$/.test(p.rel)).map(p=>Object.assign({},p));
- const sibs=P.filter(p=>sibRx.test(p.rel)&&p.id!=rec.id).concat([selfNpc(X,xid)]).map(p=>Object.assign({},p,{rel:(p.h>rec.h?"Older ":p.h<rec.h?"Younger ":"Twin ")+sibWord(p.sex)}));
+ const sibs=P.filter(p=>sibRx.test(p.rel)&&p.id!=rec.id).concat([selfNpc(X,xid)]).map(p=>Object.assign({},p,{rel:(Rof(p)>Rof(rec)+0.01?"Older ":Rof(p)<Rof(rec)-0.01?"Younger ":"Twin ")+sibWord(p.sex)}));
  return{f:X.bs.fam,people:keep.concat(sibs),sibs,from:X.name};
 }
 function arr4(lg){const a=[];for(let i=0;i<6;i++){const d=[rnd(6),rnd(6),rnd(6),rnd(6)],s=[...d].sort((x,y)=>x-y);a.push(s[1]+s[2]+s[3]);lg.push("4d6 = "+d.join(", ")+"  drop "+s[0]+"  -> "+a[i])}a.sort((x,y)=>y-x);lg.push("Random array (sorted): "+a.join(", "));return a}
 function owner(id){const r=allChars();return Object.keys(r).find(k=>r[k].bs&&r[k].bs.people.some(p=>p.id==id))}
 function develop(id,fromId,lone){
  const X=allChars()[fromId],ent=X.bs.people.find(p=>p.id==id),lg=[stamp("developed as a member of the entourage of "+X.name)];
- const rec={id,name:ent.name,spn:ent.spn,lin:ent.lin,sex:ent.sex,cls:ent.cls,align:ent.align,occ:ent.occ,att:ent.att,status:ent.status,h:ent.h,age:ent.age,init:ent.init,keep:true,lg};
+ const rec={id,name:ent.name,spn:ent.spn,lin:ent.lin,sex:ent.sex,cls:ent.cls,align:ent.align,occ:ent.occ,att:ent.att,status:ent.status,h:ent.h,R:ent.R,ht:ent.ht,age:ent.age,init:ent.init,keep:true,lg};
  lg.push("Sketch: "+ent.name+", "+ent.spn+", "+ent.sex+", age "+ent.age+", "+ent.cls+" (rolled earlier as "+ent.rel.toLowerCase()+" of "+X.name+").");
  const r=rnd(100),bg=pick(D.bg,r);rec.bg=bg[0];lg.push("d100 = "+r+"  -> origin: "+bg[0]+" ("+bg[2]+")");
  rec.arr=arr4(lg);
  const sp=D.species.find(s=>s[0]==rec.spn),cl=D.cls.find(c=>c.n==rec.cls);
  rec.src={sp:sp?sp[2]:"",cls:cl?cl.s:"",bg:bg[2]};
  const inh=sibRx.test(ent.rel)&&X.bs.fam?inherit(X,rec):null;
- const K=famKnown(id,ent.h);rec.bs=backstory(rec,inh,K,lone);
+ const K=famKnown(id,Rof(ent));rec.bs=backstory(rec,inh,K,lone);
  if(lone)lg.push("Developed as a loner: no new adventurers were created.");
  if(!inh&&!rec.bs.people.some(p=>p.id==fromId)){const inv=selfNpc(X,fromId);inv.rel=INV(ent.rel,X);rec.bs.people.unshift(inv)}
  MAIN.ent.chars[id]=rec;famSync();return rec;
@@ -486,7 +505,7 @@ function famSync(){
   }
  }
 }
-const relFor=(kind,e,Xh)=>Object.assign({},e,{rel:kind=="parent"?(e.sex=="F"?"Mother":e.sex=="M"?"Father":"Parent"):kind=="kid"?childWord(e.sex):kind=="partner"?"Spouse":(e.h>Xh?"Older ":e.h<Xh?"Younger ":"Twin ")+sibWord(e.sex)});
+const relFor=(kind,e,Xh)=>Object.assign({},e,{rel:kind=="parent"?(e.sex=="F"?"Mother":e.sex=="M"?"Father":"Parent"):kind=="kid"?childWord(e.sex):kind=="partner"?"Spouse":(Rof(e)>Xh+0.01?"Older ":Rof(e)<Xh-0.01?"Younger ":"Twin ")+sibWord(e.sex)});
 function famKnown(id,Xh){
  const reg=allChars(),K={parents:[],sibs:[],kids:[],partners:[]},by={};
  Object.keys(reg).forEach(k=>((reg[k].bs&&reg[k].bs.people)||[]).forEach(p=>{if(!by[p.id])by[p.id]=p}));
